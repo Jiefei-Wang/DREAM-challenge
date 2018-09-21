@@ -51,7 +51,6 @@ k=2
 intensityPlot(patternData$refTable[,k],geometry)
 
 
-library(GenomicRanges)
 
 
 
