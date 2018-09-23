@@ -24,8 +24,8 @@ registerDoParallel(cl)
 clusterExport(cl,"computeCov")
 ```
 
-True expression pattern generation
-==================================
+simulation of the true expression pattern
+=========================================
 
 ``` r
 #set gene numbers in insitu, dropSeq dataset. set cell numbers in dropSeq 
@@ -35,7 +35,7 @@ cellNum=1000
 #Obtain the simulation parameters
 parms=getParms()
 #Create true mean expression and dropSeq mean expression
-#First refNum column is alway the reference gene in the distMap dataset
+#First refNum column is alway the reference gene in the insitu dataset
 patternData=createPattern(chanllege.data$geometry,geneNum,refNum)
 #Create insitu mean expression
 #Two datasets do not have to measure the exactly same species, may have some gene variation.
