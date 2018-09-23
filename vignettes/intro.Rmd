@@ -2,7 +2,7 @@
 title: "Intro"
 author: "Jiefei Wang"
 date: "September 23, 2018"
-output: html_document
+output: rmarkdown::github_document
 ---
 #Basic functions
 Load packages,read functions
@@ -24,9 +24,9 @@ clusterExport(cl,"computeCov")
 #True expression pattern generation
 ```{r}
 #set gene numbers in insitu, dropSeq dataset. set cell numbers in dropSeq 
-refNum=10
+refNum=50
 geneNum=100
-cellNum=100
+cellNum=1000
 #Obtain the simulation parameters
 parms=getParms()
 #Create true mean expression and dropSeq mean expression
@@ -40,7 +40,7 @@ patternData=addSpeciesDiff(patternData,parms)
 #Data simulation
 ```{r}
 #Simulate insitu data
-sim_insitu=sampleInsituData(patternData,geneNum,parms)
+sim_insitu=sampleInsituData(patternData,refNum,parms)
 #simulate dropSeq data as well as the cell's location
 sim_dropSeq_list=sampleDropData(patternData,cellNum,parms)
 sim_dropSeq=sim_dropSeq_list$dropData
@@ -59,14 +59,15 @@ intensityPlot2(patternData$trueTable[,k],geometry,title="True drop seq")
 #The simulated data, for mortals
 intensityPlot2(sim_insitu[,k],geometry,title="Sim insitu data")
 intensityPlot2(sim_dropSeq[k,],geometry[sim_cellLoc,],title="Sim drop-seq (If you know the cells' location)")
+par(mfrow=c(1,1))
 ```
 
 
 
-#Predict the gene expression for 11th gene
-1~10 genes are in the insitu data so that we don't need to predict them
+#Predict the gene expression of the 51th gene
+1~50 genes are in the insitu data so that we don't need to predict them
 ```{r}
-k=11
+k=51
 #Normalization, just simply scaling row and column 
 sim_dropSeq_normalized=t(apply(apply(sim_dropSeq, 2, scale,center=F), 1, scale,center=F))
 row.names(sim_dropSeq_normalized)=row.names(sim_dropSeq)
@@ -80,9 +81,9 @@ dm <- binarizeSingleCellData(dm, seq(0.15, 0.5, 0.01))
 dm <- mapCells(dm)
 gene.level.pred = computeVISH(dm, k, threshold=0.75)
 
+par(mfrow=c(2,2))
 intensityPlot2(patternData$insituTable[,k],geometry,title="True insitu data")
 intensityPlot2(patternData$trueTable[,k],geometry,title="True drop-seq")
-intensityPlot2(sim_insitu[,k],geometry,title="Sim insitu data")
 intensityPlot2(gene.level.pred,geometry,title="Predicted expression")
 par(mfrow=c(1,1))
 ```
