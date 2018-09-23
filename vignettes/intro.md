@@ -27,6 +27,9 @@ clusterExport(cl,"computeCov")
 simulation of the true expression pattern
 =========================================
 
+Only god knows them
+-------------------
+
 ``` r
 #set gene numbers in insitu, dropSeq dataset. set cell numbers in dropSeq 
 refNum=50
@@ -45,6 +48,9 @@ patternData=addSpeciesDiff(patternData,parms)
 
 Data simulation
 ===============
+
+This is for mortal to see
+-------------------------
 
 ``` r
 #Simulate insitu data
