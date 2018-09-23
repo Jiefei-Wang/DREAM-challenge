@@ -58,6 +58,7 @@ sim_insitu=sampleInsituData(patternData,refNum,parms)
 #simulate dropSeq data as well as the cell's location
 sim_dropSeq_list=sampleDropData(patternData,cellNum,parms)
 sim_dropSeq=sim_dropSeq_list$dropData
+#Of couse, you wouldn't know this
 sim_cellLoc=sim_dropSeq_list$location
 ```
 
