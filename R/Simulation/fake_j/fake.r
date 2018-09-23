@@ -42,7 +42,7 @@ createPattern<-function(geometry,geneNum,refNum){
   parms=getParms(signal = 1)
   refPattern=createRefPattern_circle(geometry,parms)
   if(i<=refNum){
-    refPattern=refPattern+runif(nrow(geometry),-0.1,0.5)
+    refPattern=refPattern*2+runif(nrow(geometry),-0.1,0.1)
     refPattern[refPattern<0]=0
     refPattern[refPattern>1]=1
   }
@@ -71,7 +71,10 @@ computeCov<-function(meanPattern,parms){
   correlation <- correlation%*%t(correlation)
   #correlation[correlation>1]=1
   #correlation[correlation<-1]=-1
-  covariance=sqrt(diag(variance))%*%correlation%*%sqrt(diag(variance))
+  if(length(variance)!=1)
+    covariance=sqrt(diag(variance))%*%correlation%*%sqrt(diag(variance))
+  else
+    covariance=correlation*correlation
   set.seed(as.numeric(Sys.time()))
   return(correlation)
 }
@@ -106,6 +109,7 @@ sampleDropData<-function(patternData,cellNum,parms){
     dropData[i,]=measure
   }
   set.seed(as.numeric(Sys.time()))
+  dropData=round(dropData)
   return(dropData)
 }
 
@@ -115,19 +119,23 @@ sum(abs(measure-meanPattern))
 source("R\\commonFunc\\readData.R")
 source("R\\commonFunc\\functions.R")
 refNum=10
-geneNum=1000
+geneNum=100
 cellNum=100
 parms=getParms()
+parms$varInflation_insitu=0.0001
 patternData=createPattern(geometry,geneNum,refNum)
 patternData=addSpeciesDiff(patternData,parms)
 
-sim_insitu=sampleInsituData(patternData,refNum,parms)
+sim_insitu=sampleInsituData(patternData,geneNum,parms)
 sim_drop=sampleDropData(patternData,cellNum,parms)
 
 
 
-k=2
-intensityPlot(patternData$refTable[,k],geometry)
+k=11
+intensityPlot(patternData$refTable_true[,k],geometry)
+
+intensityPlot(sim_insitu[,k],geometry)
+
 
 
 a
