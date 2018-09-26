@@ -1,0 +1,29 @@
+
+attachFunc<-function(mydata,normalize,normalize.parm,computeDist,dist.parm,predict.location,predict.pattern){
+  mydata$normalize=normalize
+  mydata$N_parm=normalize_parm
+  mydata$computeDist=computeDist
+  mydata$d_parm=dist.parm
+  mydata$pred_loc=predict.location
+  mydata$compute_pattern=predict.pattern
+}
+
+normalize<-function(mydata){
+  mydata$normalize(mydata)
+}
+compute_dist<-function(mydata){
+  mydata$computeDist(mydata)
+}
+pred_loc<-function(mydata){
+  mydata$pred_loc(mydata)
+}
+compute_pattern<-function(mydata){
+  mydata$compute_pattern(mydata)
+}
+predict_all<-function(){
+mydata=normalize(mydata)
+mydata=compute_dist(mydata)
+mydata=pred_loc(mydata)
+mydata=compute_pattern(mydata)
+mydata
+}

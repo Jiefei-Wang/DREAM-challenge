@@ -1,7 +1,8 @@
+library(doParallel)
 getParms<-function(dispersion_x=0.8,dispersion_z=0.3,signal=1){
   parms=list(dispersion_x=dispersion_x,dispersion_z=dispersion_z,signal=signal,
              transf=function(x)log((x+1)),maxCount=100,
-             speciesDiff=0.1,
+             speciesDiff=0.01,
              corInflation=1,varInflation_insitu=0.01,varInflation_drop=1,blockNum=40)
   return(parms)
 }
@@ -71,7 +72,7 @@ return(pattern)
 }
 #Adding the species effect
 #(the species measured in insitu data is not necessarily the species measured in drop-seq)
-addSpeciesDiff<-function(pattern,parms){
+addSpeciesDiff<-function(patternData,parms){
   refTable=patternData$trueTable
   speciesDiff=matrix(rnorm(length(refTable),sd=parms$speciesDiff),nrow(refTable),ncol(refTable))
   patternData$insituTable=patternData$trueTable+speciesDiff

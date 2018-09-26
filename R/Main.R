@@ -9,7 +9,6 @@ source("R\\Simulation\\fake\\fake.R")
 #register parallel computing
 cl=makeCluster(11)
 registerDoParallel(cl)
-clusterExport(cl,"computeCov")
 #===========================preprocess=============================
 #set gene numbers in distMap, dropSeq, and cell numbers in dropSeq 
 refNum=50
