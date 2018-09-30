@@ -1,6 +1,6 @@
-library(doParallel)
+
 getParms<-function(dispersion_x=0.8,dispersion_z=0.3,signal=1){
-  parms=list(dispersion_x=dispersion_x,dispersion_z=dispersion_z,signal=signal,
+  parms=list(dispersion_x=dispersion_x,dispersion_z=dispersion_z,signal=signal,refGeneSignal=0.01,
              transf=function(x)log((x+1)),maxCount=100,
              speciesDiff=0.01,
              corInflation=1,varInflation_insitu=0.01,varInflation_drop=1,blockNum=40)
@@ -42,12 +42,11 @@ createdropSeqPattern<-function(truePattern,parms){
 #refNum represents the number of genes in distmap
 #The first refNum column is the reference gene
 #For the reference gene, adding more variation to make it unique in every location
-createPattern<-function(geometry,geneNum,refNum){
+createPattern<-function(geometry,geneNum,refNum,parms){
   trueTable=matrix(0,length(geometry$x),geneNum)
   dropTable=matrix(0,length(geometry$x),geneNum)
   parmsList=c()
   for(i in 1:geneNum){
-  parms=getParms(signal = 1)
   if(i>refNum){
     parms$dispersion_x=parms$dispersion_x/4
     parms$dispersion_y=parms$dispersion_y/4
@@ -55,7 +54,7 @@ createPattern<-function(geometry,geneNum,refNum){
   truePattern=createTruePattern_circle(geometry,parms)
   #if it is reference gene, add variation
   if(i<=refNum){
-    truePattern=truePattern*2+runif(nrow(geometry),-0.1,0.1)
+    truePattern=truePattern*2+runif(nrow(geometry),-parms$refGeneSignal,parms$refGeneSignal)
     truePattern[truePattern<0]=0
     truePattern[truePattern>1]=1
   }
@@ -110,7 +109,7 @@ sampleDropData<-function(patternData,cellNum,parms){
   geneNum=ncol(dropMean)
   packageList=c("mvtnorm")
   #for(i in 1:cellNum){
-  sim=foreach(i=1:cellNum,.combine= cbind,.multicombine=TRUE,.inorder=FALSE,.packages =packageList)%dopar%{
+  sim=foreach(i=1:cellNum,.combine= cbind,.multicombine=TRUE,.inorder=FALSE,.packages =packageList,.export=c("computeCov"))%dopar%{
     meanPattern=dropMean[i,]
     set.seed(sum(meanPattern))
     block=rmultinom(1,geneNum,runif(parms$blockNum,0,1))
@@ -127,6 +126,7 @@ sampleDropData<-function(patternData,cellNum,parms){
     }
     measure[measure<0]=0
     measure
+    #dropData[,i]=measure
   }
   dropData=sim
   set.seed(as.numeric(Sys.time()))
