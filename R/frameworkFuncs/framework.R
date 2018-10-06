@@ -1,4 +1,7 @@
 library(doParallel)
+for(pkg in clusterPkg)
+  library(pkg,character.only=T)
+
 if(exists("cl",parent.frame())){
   try(stopCluster(cl))
 }

@@ -26,6 +26,9 @@ generate_fake<-function(geometry,refNum,geneNum,cellNum){
   sim_dropSeq_list=sampleDropData(patternData,cellNum,parms)
   sim_dropSeq=sim_dropSeq_list$dropData
   sim_cellLoc=sim_dropSeq_list$location
+  
+  sim_dropSeq=addInflationError(sim_dropSeq,parms)
+  
   mydata=list(refNum=refNum,geneNum=geneNum,cellNum=cellNum,insitu=sim_insitu,drop=sim_dropSeq)
   metaData=list(cell_loc=sim_cellLoc,patternData=patternData,simData=mydata)
   

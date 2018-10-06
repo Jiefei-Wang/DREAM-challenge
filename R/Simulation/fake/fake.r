@@ -3,7 +3,10 @@ getParms<-function(dispersion_x=0.8,dispersion_z=0.3,signal=1){
   parms=list(dispersion_x=dispersion_x,dispersion_z=dispersion_z,signal=signal,refGeneSignal=0.01,
              transf=function(x)log((x+1)),maxCount=100,
              speciesDiff=0.01,
-             corInflation=1,varInflation_insitu=0.01,varInflation_drop=2,blockNum=40)
+             corInflation=1,varInflation_insitu=0.01,varInflation_drop=2,blockNum=40,
+             singleInflation=0.01,singleInflationRate=10,
+             cellInflation=0.01,cellInflationRate=5,
+             geneInflation=0.01,geneInflationRate=2)
   return(parms)
 }
 
@@ -47,10 +50,8 @@ createPattern<-function(geometry,geneNum,refNum,parms){
   dropTable=matrix(0,length(geometry$x),geneNum)
   parmsList=c()
   for(i in 1:geneNum){
-  if(i>refNum){
-    parms$dispersion_x=parms$dispersion_x/4
-    parms$dispersion_y=parms$dispersion_y/4
-  } 
+    parms$dispersion_x=parms$dispersion_x
+    parms$dispersion_y=parms$dispersion_y
   truePattern=createTruePattern_circle(geometry,parms)
   #if it is reference gene, add variation
   if(i<=refNum){
@@ -136,6 +137,28 @@ sampleDropData<-function(patternData,cellNum,parms){
   result=list(dropData=dropData,location=ind)
   return(result)
 }
-
-
+addInflationError<-function(dropData,parms){
+  #Cell error
+  n=ncol(dropData)
+  num=round(n*parms$cellInflation)
+  ind=sample(1:n,num)
+  #dropData[,ind]=sweep(matrix(dropData[,ind],ncol=length(ind)),2,rpois(num,parms$cellInflationRate),"*")
+  dropData[,ind]=dropData[,ind]*rpois(num*nrow(dropData),parms$cellInflationRate)
+    
+    
+  #gene error
+  n=nrow(dropData)
+  num=round(n*parms$geneInflation)
+  ind=sample(1:n,num)
+  #dropData[ind,]=sweep(matrix(dropData[ind,],nrow=length(ind)),1,rpois(num,parms$geneInflationRate),"*")
+  dropData[ind,]=dropData[ind,]*rpois(num*ncol(dropData),parms$cellInflationRate)
+  
+  #Single entry error
+  n=length(dropData)
+  num=round(n*parms$singleInflation)
+  ind=sample(1:n,num)
+  dropData[ind]=dropData[ind]*rpois(num,parms$singleInflationRate)
+  
+  dropData
+}
 

@@ -7,6 +7,7 @@ library(doParallel)
 clusterNum=10
 clusterPkg=c("rpgm","Rfast","edgeR")
 
+
 source("R\\commonFunc\\readData.R")
 source("R\\commonFunc\\functions.R")
 source("R\\frameworkFuncs\\framework.R")
@@ -29,7 +30,7 @@ mydataList=attachFunc_list(mydata,normalization=c("columnSum","rowMax","rowMaxlo
 
 #Compute the performance
 result=computePerformance(mydataList,simulation,parallel=T)
-result
+result[order(result$prediction_score,decreasing=T),]
 #The relationship between scores
 plot(result$pattern_score,result$prediction_score)
 
@@ -38,13 +39,13 @@ dm_list=originalMethod(mydata,simulation)
 dm_list$score
 
 #Let's see one pattern
-mydata=mydataList[[1]]
+mydata=mydataList[[9]]
 mydata=predict_all(mydata)
 mean(patternScore(mydata$pattern,simulation$patternData$dropTable,refNum+1,geneNum))
 mean(predictionScore(mydata$loc,simulation$cell_loc))
 
 
-gene=58
+gene=61
 intensityPlot2(simulation$patternData$dropTable[,gene],geometry,title="true pattern")
 intensityPlot2(mydata$pattern[,gene],geometry,title="predicted pattern")
 intensityPlot2(dm_list$pattern[,gene],geometry,title="predicted pattern, author's method")
