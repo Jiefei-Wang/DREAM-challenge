@@ -3,7 +3,7 @@
 #BiocManager::install("edgeR")
 library(doParallel)
 
-#Set the cluster numbers and the packages that will be export to the clusters.
+#Set the number of the clusters and the packages that will be export to the clusters.
 clusterNum=10
 clusterPkg=c("rpgm","Rfast","edgeR")
 
