@@ -1,6 +1,12 @@
+#install.packages("Rfast")
+#install.packages("rpgm")
+#BiocManager::install("edgeR")
+library(doParallel)
 
+#Set the cluster numbers and the packages that will be export to the clusters.
+clusterNum=10
+clusterPkg=c("rpgm","Rfast","edgeR")
 
-clusterNum=4
 source("R\\commonFunc\\readData.R")
 source("R\\commonFunc\\functions.R")
 source("R\\frameworkFuncs\\framework.R")
@@ -17,29 +23,28 @@ getDistFuncs()
 getPatternFuncs()
 
 
-mydataList=attachFunc_list(mydata,normalization=c("rowMax","simple"),distance=c("mse","simple"),pattern=c("simple"))
-
 #attach function to the data and compute the performance
-#The number is the index of the function obtained from the above three functions
-mydataList=attachFunc_list(mydata,normalization=1,distance=2,pattern=1)
-mydataList=c(mydataList,attachFunc_list(mydata,normalization=3,distance=2,pattern=1))
-mydataList=c(mydataList,attachFunc_list(mydata,normalization=1,distance=1,pattern=1))
-mydataList=c(mydataList,attachFunc_list(mydata,normalization=3,distance=1,pattern=1))
+#The parameter can be the function name or the index of the function obtained from the above three functions
+mydataList=attachFunc_list(mydata,normalization=c("columnSum","rowMax","rowMaxlog","TMM","scale"),distance=c("mse","cov"),pattern=c("simple"))
+
 #Compute the performance
 result=computePerformance(mydataList,simulation,parallel=T)
 result
-
+#The relationship between scores
+plot(result$pattern_score,result$prediction_score)
 
 #The author's method
 dm_list=originalMethod(mydata,simulation)
 dm_list$score
 
 #Let's see one pattern
-mydata=mydataList[[2]]
+mydata=mydataList[[1]]
 mydata=predict_all(mydata)
-mean(patternScore(mydata$pattern,simulation$patternData$dropTable,1,geneNum))
+mean(patternScore(mydata$pattern,simulation$patternData$dropTable,refNum+1,geneNum))
+mean(predictionScore(mydata$loc,simulation$cell_loc))
 
-gene=51
+
+gene=58
 intensityPlot2(simulation$patternData$dropTable[,gene],geometry,title="true pattern")
 intensityPlot2(mydata$pattern[,gene],geometry,title="predicted pattern")
 intensityPlot2(dm_list$pattern[,gene],geometry,title="predicted pattern, author's method")

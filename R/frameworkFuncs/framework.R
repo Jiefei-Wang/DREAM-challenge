@@ -1,10 +1,9 @@
 library(doParallel)
 if(exists("cl",parent.frame())){
-  registerDoParallel(cl)
-}else{
-  cl <- makePSOCKcluster(clusterNum)
-  registerDoParallel(cl)
+  try(stopCluster(cl))
 }
+cl <- makePSOCKcluster(clusterNum)
+registerDoParallel(cl)
 #========================Read functions into a namespace=======================
 for(env in search()){
   if(env=="Normalization") detach(env,character.only=T)

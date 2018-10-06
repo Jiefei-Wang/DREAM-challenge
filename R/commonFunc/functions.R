@@ -20,13 +20,11 @@ intensityPlot2<-function(gene_level,geometry,cut_quantile=0.9,title="",side="xz"
   if(title=="")
     title=as.character(substitute(gene_level))
   gene_level[gene_level<quantile(gene_level,cut_quantile)]=quantile(gene_level,cut_quantile)
+  col.lowest=col.range[1]
+  col.lowest05=col.range[1]+(col.range[2]-col.range[1])*0.05
+  col.highest=col.range[2]
   if(var(gene_level)!=0){
     gene_level=scale(gene_level)
-    col.lowest=col.range[1]
-    col.lowest05=col.range[1]+(col.range[2]-col.range[1])*0.05
-    col.highest=col.range[2]
-    #cutoff=0.0001
-    #gene_level_nonzero=gene_level[gene_level>=cutoff]
     gene_level_min=min(gene_level)
     gene_level_max=max(gene_level)
     gene.col=col.lowest05-col.lowest+(gene_level-gene_level_min)/(gene_level_max-gene_level_min)*(col.highest-col.lowest05)

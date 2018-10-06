@@ -1,17 +1,19 @@
 computePerformance<-function(dataList,simulation,parallel){
   performance=data.frame()
   if(parallel){
+    #Add the global function into export list
     g=ls(globalenv())
     global_func=c()
     for(i in 1:length(g))
       if(is.function(get(g[i])))
         global_func=c(global_func,g[i])
     export=c(ls(as.environment("Scoring")),global_func)
-    performance=foreach(i=1:length(dataList),.combine= rbind,.multicombine=TRUE,.inorder=FALSE,.export=export)%dopar%{
+    #compute the score
+    performance=foreach(i=1:length(dataList),.combine= rbind,.multicombine=TRUE,.inorder=FALSE,.export=export,.packages=clusterPkg)%dopar%{
       curData=dataList[[i]]
       curData=predict_all(curData)
       pattern_score=patternScore(curData$pattern,simulation$patternData$dropTable,curData$refNum+1,curData$geneNum)
-      pattern_score=mean(pattern_score)
+      pattern_score=mean(pattern_score,na.rm = T)
       pred_score=predictionScore(curData$loc,simulation$cell_loc)
       pred_score=pred_score
       data.frame(normalization=curData$funcName[1],
@@ -24,7 +26,7 @@ computePerformance<-function(dataList,simulation,parallel){
     curData=dataList[[i]]
     curData=predict_all(curData)
     pattern_score=patternScore(curData$pattern,simulation$patternData$dropTable,curData$refNum+1,curData$geneNum)
-    pattern_score=mean(pattern_score)
+    pattern_score=mean(pattern_score,na.rm = T)
     pred_score=predictionScore(curData$loc,simulation$cell_loc)
     pred_score=pred_score
     performance=rbind(performance,data.frame(normalization=curData$funcName[1],
@@ -37,9 +39,10 @@ computePerformance<-function(dataList,simulation,parallel){
 
 #predPattern=mydata$pattern
 #truePattern=simulation$patternData$dropTable
-#gene_start=92
-#gene_end=92
+#gene_start=51
+#gene_end=100
 patternScore<-function(predPattern,truePattern,gene_start,gene_end){
+  turning=0.01
   predPattern=matrix(predPattern[,gene_start:gene_end],nrow(predPattern))
   truePattern=matrix(truePattern[,gene_start:gene_end],nrow(predPattern))
   weight_sig=2
@@ -49,24 +52,20 @@ patternScore<-function(predPattern,truePattern,gene_start,gene_end){
   score=rep(NA,ncol(predPattern))
   for(i in 1:ncol(predPattern)){
     pred_cl=(predPattern[,i]>quantile(predPattern[,i],1-n_sig[i]/n_loc))
-    mytable=table(true_cl[,i],pred_cl)
-    if(nrow(mytable)==1&ncol(mytable)==1){
-      score[i]=1
-      next
-    }else{
-      if(nrow(mytable)==1)
-        mytable=t(mytable)
-      if(ncol(mytable)==1){
-        if(colnames(mytable)=="FALSE")
-        {score[i]=mytable[1,1]/(n_loc-n_sig[i])/(1+weight_sig)
-        next}
-        else
-        {score[i]=weight_sig*mytable[2,1]/n_sig[i]/(1+weight_sig)
-        next}
-      }
-    }
-    
-    score[i]=(mytable[1,1]/(n_loc-n_sig[i])+weight_sig*mytable[2,2]/n_sig[i])/(1+weight_sig)
+    mytable=table(factor(true_cl[,i],levels = c(F,T)),factor(pred_cl,levels = c(F,T)))
+    margin1=rowSums(mytable)/n_loc
+    margin2=colSums(mytable)/n_loc
+    E_specificity=margin1[1]*margin2[1]
+    E_sensityvity=margin1[2]*margin2[2]
+    T_specificity=(mytable[1,1]+turning)/(n_loc-n_sig[i]+turning)
+    T_sensityvity=(mytable[2,2]+turning)/(n_sig[i]+turning)
+    scale1=min(E_specificity,1-E_specificity)
+    scale2=min(E_sensityvity,1-E_sensityvity)
+    if(scale1<0.01)scale1=0.01
+    if(scale2<0.01)scale2=0.01
+    df_specificity=(T_specificity-E_specificity)/scale1
+    df_sensityvity=(T_sensityvity-E_sensityvity)/scale2
+    score[i]=(df_specificity+weight_sig*df_sensityvity)/(1+weight_sig)
   }
   return(score)
 }
