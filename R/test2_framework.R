@@ -1,4 +1,6 @@
 
+
+clusterNum=4
 source("R\\commonFunc\\readData.R")
 source("R\\commonFunc\\functions.R")
 source("R\\frameworkFuncs\\framework.R")
@@ -26,6 +28,7 @@ mydataList=c(mydataList,attachFunc_list(mydata,normalization=3,distance=1,patter
 #Compute the performance
 result=computePerformance(mydataList,simulation,parallel=T)
 result
+
 
 #The author's method
 dm_list=originalMethod(mydata,simulation)

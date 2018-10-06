@@ -2,7 +2,7 @@ library(doParallel)
 if(exists("cl",parent.frame())){
   registerDoParallel(cl)
 }else{
-  cl <- makePSOCKcluster(10)
+  cl <- makePSOCKcluster(clusterNum)
   registerDoParallel(cl)
 }
 #========================Read functions into a namespace=======================
@@ -53,6 +53,7 @@ attachFunc<-function(mydata,normalize,normalize.parm,computeDist,dist.parm,predi
 #Same as attachFunc, but the parameter can be an integer
 #The attached function's paramter will be automatically find
 attachFunc_list<-function(mydata,normalization,distance,pattern){
+
   model_list=list()
   for(i in 1:length(normalization))
     for(j in 1: length(distance))
@@ -76,6 +77,7 @@ attachFunc_hide<-function(mydata,normalization,distance,pattern){
     pattern=paste0("computePattern_",pattern,collapse = "")
   }else
     pattern=paste0("computePattern_",getPatternFuncs()[pattern],collapse = "")
+
   #Obtain the function parameters
   normalization_parm_fun=getFunParms(normalization)
   if(is.null(normalization_parm_fun)){
@@ -129,7 +131,6 @@ mydata
 
 #========================Show all the available functions=======================
 getNormFuncs<-function(){
-  
   gsub("normalize_","",getFuncList("Normalization"),fixed = T)
 }
 getDistFuncs<-function(){
@@ -138,6 +139,7 @@ getDistFuncs<-function(){
 
 getPatternFuncs<-function(){
   gsub("computePattern_","",getFuncList("Pattern"),fixed = T)
+
 }
 getFuncList<-function(spaceName){
   funcs=ls(envir=as.environment(spaceName))

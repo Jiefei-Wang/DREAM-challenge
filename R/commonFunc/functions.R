@@ -57,8 +57,9 @@ originalMethod<-function(mydata,simulation){
   dm <- mapCells(dm)
   dm_res=sapply(1:geneNum,computeVISH,object=dm,threshold=0.75)
   dm_pattern_score=patternScore(dm_res,simulation$patternData$dropTable,mydata$refNum+1,mydata$geneNum)
-  dm_loc=predLocation(list(distance=dm@mcc.scores))
-  dm_pred_score=predictionScore(-dm_loc$loc,simulation$cell_loc)
+
+  dm_loc=predLocation(list(distance=-dm@mcc.scores))
+  dm_pred_score=predictionScore(dm_loc$loc,simulation$cell_loc)
   dm_pred_score
   list(pattern=dm_res,score=data.frame(normalization="scale",
              distance="Authors",
