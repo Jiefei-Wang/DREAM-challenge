@@ -53,19 +53,29 @@ attachFunc<-function(mydata,normalize,normalize.parm,computeDist,dist.parm,predi
 #Same as attachFunc, but the parameter can be an integer
 #The attached function's paramter will be automatically find
 attachFunc_list<-function(mydata,normalization,distance,pattern){
+  model_list=list()
+  for(i in 1:length(normalization))
+    for(j in 1: length(distance))
+      for(k in 1: length(pattern)){
+        model_list=c(model_list,attachFunc_hide(mydata,normalization[i],distance[j],pattern[k]))}
+  model_list
+}
+attachFunc_hide<-function(mydata,normalization,distance,pattern){
   #Check the input
-  if(!is.function(normalization)){
-    normalization=getNormFuncs()[normalization]
+  if(is.character(normalization)){
+    normalization=paste0("normalize_",normalization,collapse = "")
   }else
-    normalization=as.character(substitute(normalization))
-  if(!is.function(distance)){
-    distance=getDistFuncs()[distance]
+    normalization=paste0("normalize_",getNormFuncs()[normalization],collapse = "")
+  
+  if(is.character(distance)){
+    distance=paste0("computeDist_",distance,collapse = "")
   }else
-    distance=as.character(substitute(distance))
-  if(!is.function(pattern)){
-    pattern=getPatternFuncs()[pattern]
+    distance=paste0("computeDist_",getDistFuncs()[distance],collapse = "")
+  
+  if(is.character(pattern)){
+    pattern=paste0("computePattern_",pattern,collapse = "")
   }else
-    pattern=as.character(substitute(pattern))
+    pattern=paste0("computePattern_",getPatternFuncs()[pattern],collapse = "")
   #Obtain the function parameters
   normalization_parm_fun=getFunParms(normalization)
   if(is.null(normalization_parm_fun)){
@@ -119,14 +129,15 @@ mydata
 
 #========================Show all the available functions=======================
 getNormFuncs<-function(){
-  getFuncList("Normalization")
+  
+  gsub("normalize_","",getFuncList("Normalization"),fixed = T)
 }
 getDistFuncs<-function(){
-  getFuncList("Distance")
+  gsub("computeDist_","",getFuncList("Distance"),fixed = T)
 }
 
 getPatternFuncs<-function(){
-  getFuncList("Pattern")
+  gsub("computePattern_","",getFuncList("Pattern"),fixed = T)
 }
 getFuncList<-function(spaceName){
   funcs=ls(envir=as.environment(spaceName))

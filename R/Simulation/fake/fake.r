@@ -3,7 +3,7 @@ getParms<-function(dispersion_x=0.8,dispersion_z=0.3,signal=1){
   parms=list(dispersion_x=dispersion_x,dispersion_z=dispersion_z,signal=signal,refGeneSignal=0.01,
              transf=function(x)log((x+1)),maxCount=100,
              speciesDiff=0.01,
-             corInflation=1,varInflation_insitu=0.01,varInflation_drop=1,blockNum=40)
+             corInflation=1,varInflation_insitu=0.01,varInflation_drop=2,blockNum=40)
   return(parms)
 }
 

@@ -14,6 +14,9 @@ getNormFuncs()
 getDistFuncs()
 getPatternFuncs()
 
+
+mydataList=attachFunc_list(mydata,normalization=c("rowMax","simple"),distance=c("mse","simple"),pattern=c("simple"))
+
 #attach function to the data and compute the performance
 #The number is the index of the function obtained from the above three functions
 mydataList=attachFunc_list(mydata,normalization=1,distance=2,pattern=1)
