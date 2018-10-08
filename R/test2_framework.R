@@ -32,7 +32,7 @@ mydataList=attachFunc_list(mydata,normalization=c("columnSum","rowMax","rowMaxlo
 result=computePerformance(mydataList,simulation,parallel=T)
 result[order(result$prediction_score,decreasing=T),]
 #The relationship between scores
-plot(result$prediction_score,result$pattern_score)
+plot(result$prediction_score,result$pattern_score,xlab="Prediction score",ylab="Pattern score")
 
 #The author's method
 dm_list=originalMethod(mydata,simulation)
