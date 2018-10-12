@@ -15,6 +15,7 @@ normalize_columnSum <- function(mydata){
   return(mydata)
 }
 
+
 normalize_rowMaxlog <- function(mydata){
   
   
@@ -46,5 +47,22 @@ normalize_TMM <- function(mydata){
   
                         
  return(mydata)
+}
+
+
+
+normalize_upqu <- function(mydata){
+  parm=mydata$N_parm
+  #insitu
+  quantileExpressed <- apply(mydata$insitu, 1, function(x){quantile(x[x>0], parm)})
+  mydata$N_insitu <- sweep(mydata$insitu,1,quantileExpressed,"/") 
+  #dropseq
+  quantileExpressed <- apply(mydata$drop, 1, function(x){quantile(x[x>0], parm)})
+  mydata$N_drop <- sweep(mydata$drop,1,quantileExpressed,"/")
+  return(mydata)  
+}
+get_parm_upqu <- function(param){
+  n=40
+  return(as.list(seq(1,n-1,by=2)/n))
 }
 

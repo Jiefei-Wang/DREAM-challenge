@@ -4,7 +4,7 @@
 library(doParallel)
 
 #Set the number of the clusters and the packages that will be export to the clusters.
-clusterNum=10
+clusterNum=4
 clusterPkg=c("rpgm","Rfast","edgeR")
 
 
@@ -27,6 +27,9 @@ getPatternFuncs()
 #attach function to the data and compute the performance
 #The parameter can be the function name or the index of the function obtained from the above three functions
 mydataList=attachFunc_list(mydata,normalization=c("columnSum","rowMax","rowMaxlog","TMM","scale"),distance=c("mse","cov"),pattern=c("simple"))
+
+mydataList=attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),pattern=c("simple"))
+
 
 #Compute the performance
 result=computePerformance(mydataList,simulation,parallel=T)

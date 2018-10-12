@@ -20,3 +20,6 @@ computePattern_simple1<-function(mydata,gene){
   pattern=sweep(1/(dist+0.0001),2,geneExp,FUN = '*')
   rowSums(pattern)
 }
+
+
+
