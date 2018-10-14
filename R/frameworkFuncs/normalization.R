@@ -66,3 +66,21 @@ get_parm_upqu <- function(param){
   return(as.list(seq(1,n-1,by=2)/n))
 }
 
+normalize_quantile<-function(mydata){
+  parm=mydata$N_parm
+  mydata$N_insitu<-apply(mydata$insitu,2,function(x){as.integer(x>quantile(x,parm))})
+  mydata$N_drop<-apply(mydata$drop,1,function(x){as.integer(x>quantile(x,parm))})
+  
+  if(sum(abs(dim(mydata$N_drop)-dim(mydata$drop)))!=0)
+    mydata$N_drop=t(mydata$N_drop)
+  if(sum(abs(dim(mydata$N_insitu)-dim(mydata$insitu)))!=0)
+    mydata$N_insitu=t(mydata$N_insitu)
+  mydata
+}
+
+get_parm_quantile<-function(){
+  n=40
+  return(as.list(seq(1,n-1,by=2)/n))
+}
+
+

@@ -10,7 +10,7 @@ computePattern_simple<-function(mydata,gene){
 
 
 computePattern_simple1<-function(mydata,gene){
-  n=2
+  n=10
   geneExp=mydata$N_drop[gene,]
   tmp=mydata$distance
   indice=apply(tmp,2,function(x,n){rank(x,ties.method="random")<=n},n=n)
@@ -22,4 +22,16 @@ computePattern_simple1<-function(mydata,gene){
 }
 
 
-
+computePattern_author<-function(mydata, gene) {
+  threshold=0.75
+  gene.expr <- mydata$drop[gene,]
+  m=max(mydata$distance)
+  b1 <- sweep(m-mydata$distance, 2, gene.expr, '*')
+  gene.expr[gene.expr > 0] <- 1
+  b2 <- sweep(m-mydata$distance, 2, gene.expr, '*')
+  q <- rowSums(b1)/rowSums(b2)
+  q[is.na(q)] <- 0
+  q <- q/(1+q)
+  q[q < quantile(q, threshold)] <- 0
+  return (q)
+}

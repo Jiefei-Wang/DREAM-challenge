@@ -45,6 +45,17 @@ patternScore<-function(predPattern,truePattern,gene_start,gene_end){
   turning=0.01
   predPattern=matrix(predPattern[,gene_start:gene_end],nrow(predPattern))
   truePattern=matrix(truePattern[,gene_start:gene_end],nrow(predPattern))
+  score=rep(NA,ncol(predPattern))
+  for(i in 1:ncol(predPattern)){
+    score[i]=cor(predPattern[,i],truePattern[,i],method="spearman")
+  }
+  return(score)
+}
+
+patternScore1<-function(predPattern,truePattern,gene_start,gene_end){
+  turning=0.01
+  predPattern=matrix(predPattern[,gene_start:gene_end],nrow(predPattern))
+  truePattern=matrix(truePattern[,gene_start:gene_end],nrow(predPattern))
   weight_sig=2
   n_loc=nrow(truePattern)
   true_cl=(truePattern!=0)
