@@ -29,13 +29,18 @@ getPatternFuncs()
 mydataList=attachFunc_list(mydata,normalization=c("quantile"),distance=c("mcc"),pattern=c("simple1","author"))
 mydataList=c(mydataList,attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),pattern=c("simple1","author")))
 
+mydataList=attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),pattern=c("author"))
 
 #Compute the performance
 result=computePerformance(mydataList,simulation,parallel=T)
 result[order(result$prediction_score,decreasing=T),]
 
 #The relationship between scores
-ggplot(result, aes(x=prediction_score, y=pattern_score,color=normalization,shape=distance)) + geom_point()+facet_grid(. ~ pattern)
+ggplot(result, aes(x=prediction_score, y=pattern_score_test,color=normalization,shape=distance)) + geom_point()+facet_grid(. ~ pattern)
+
+
+
+ggplot(result, aes(x=pattern_score_train, y=pattern_score_test))+ geom_point()
 
 
 #The author's method
