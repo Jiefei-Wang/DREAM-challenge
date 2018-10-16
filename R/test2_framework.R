@@ -33,10 +33,11 @@ mydataList=attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),patt
 
 #Compute the performance
 result=computePerformance(mydataList,simulation,parallel=T)
+result$model=factor(paste(result$normalization,result$distance,sep="+"))
 result[order(result$prediction_score,decreasing=T),]
 
 #The relationship between scores
-ggplot(result, aes(x=prediction_score, y=pattern_score_test,color=normalization,shape=distance)) + geom_point()+facet_grid(. ~ pattern)
+ggplot(result, aes(x=prediction_score, y=pattern_score_test,color=model)) + geom_point()+facet_grid(. ~ pattern)
 
 
 
