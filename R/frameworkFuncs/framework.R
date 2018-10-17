@@ -2,11 +2,11 @@ library(doParallel)
 for(pkg in clusterPkg)
   library(pkg,character.only=T)
 
-if(!exists("cl",parent.frame())){
-  #try(stopCluster(cl))
-  cl <- makePSOCKcluster(clusterNum)
-  registerDoParallel(cl)
+if(exists("cl",parent.frame())){
+  try(stopCluster(cl))
 }
+cl <- makePSOCKcluster(clusterNum)
+registerDoParallel(cl)
 
 #========================Read functions into a namespace=======================
 for(env in search()){

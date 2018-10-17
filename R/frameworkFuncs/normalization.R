@@ -84,3 +84,17 @@ get_parm_quantile<-function(){
 }
 
 
+normalize_Mingmei <- function(mydata){
+  
+  factor1 <- colSums(mydata$drop)/max(colSums(mydata$drop))
+  
+  factor2 <- rowSums(mydata$insitu)/max(rowSums(mydata$insitu))
+  
+  mydata$N_drop <- log(1+sweep(mydata$drop, 2, factor1, "/"))
+  
+  mydata$N_insitu <- log(1+sweep(mydata$insitu, 1, factor2, "/"))
+  
+  return(mydata)
+  
+}
+

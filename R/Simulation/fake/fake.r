@@ -30,6 +30,7 @@ for(i in 1:length(x)){
 }
 intensity=(intensity-min(intensity))/(max(intensity)-min(intensity))
 if(is.nan(sum(intensity))) return(rep(0,length(x)))
+intensity[intensity<0]=0
 return(intensity)
 }
 
@@ -99,6 +100,7 @@ computeCov<-function(meanPattern,parms){
 sampleInsituData<-function(patternData,refNum,parms){
   insituMean=patternData$insituTable[,1:refNum]
   insituData=insituMean+matrix(rnorm(length(insituMean),0,parms$varInflation_insitu),nrow(insituMean),ncol(insituMean))
+  insituData[insituData<0]=0
   return(insituData)
 }
 #simulate drop-seq data(With some degree of correlation between genes)

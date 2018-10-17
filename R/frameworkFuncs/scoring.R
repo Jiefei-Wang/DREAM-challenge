@@ -43,10 +43,13 @@ computePerformance<-function(dataList,simulation,parallel){
                                              pattern_score_test=pattern_score_test,
                                              prediction_score=pred_score))
   }
+  performance$pattern_score_train=round(performance$pattern_score_train,3)
+  performance$pattern_score_test=round(performance$pattern_score_test,3)
+  performance$prediction_score=round(performance$prediction_score,3)
   return(performance)
 }
 
-#predPattern=mydata$pattern
+#predPattern=myModel$pattern
 #truePattern=simulation$patternData$dropTable
 #gene_start=51
 #gene_end=100
@@ -67,7 +70,7 @@ patternScore<-function(predPattern,truePattern,gene_start,gene_end){
     margin2=colSums(mytable)/n_loc
     T_specificity=(mytable[1,1]+turning)/(n_loc-n_sig[i]+turning)
     T_sensityvity=(mytable[2,2]+turning)/(n_sig[i]+turning)
-    score[i]=mean(T_specificity,T_sensityvity)
+    score[i]=min(c(T_specificity,T_sensityvity))
   }
   return(score)
 }
