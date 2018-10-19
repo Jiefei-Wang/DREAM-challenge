@@ -19,43 +19,63 @@ computePerformance<-function(dataList,simulation,parallel){
       curData=dataList[[i]]
       curData$insitu=insitu
       curData$drop=drop
-      curData=predict_all(curData)
-      pattern_score_test=patternScore(curData$pattern,simulation$patternData$dropTable,curData$refNum+1,curData$geneNum)
-      pattern_score_train=patternScore(curData$pattern,simulation$patternData$dropTable,1,curData$refNum)
-      pattern_score_test=mean(pattern_score_test,na.rm = T)
-      pattern_score_train=mean(pattern_score_train,na.rm = T)
-      
-      pred_score=predictionScore(curData$loc,simulation$cell_loc)
-      pred_score=pred_score
-      data.frame(normalization=curData$funcName[1],
-                 distance=curData$funcName[2],
-                 pattern=curData$funcName[3],
-                 pattern_score_train=pattern_score_train,
-                 pattern_score_test=pattern_score_test
-                 ,prediction_score=pred_score)
+      curData=predict_all(curData,pattern=F)
+      res=c()
+      patternFuncList=curData$compute_pattern
+      patternParmList=curData$p_parm
+      for(j in 1:length(patternFuncList)){
+        curData$compute_pattern=patternFuncList[[j]]
+        curData$p_parm=patternParmList[[j]]
+        curData$pattern=sapply(1:curData$geneNum,predict_pattern,mydata=curData)
+        pattern_score_test=patternScore(curData$pattern,simulation$patternData$dropTable,curData$refNum+1,curData$geneNum)
+        pattern_score_train=patternScore(curData$pattern,simulation$patternData$dropTable,1,curData$refNum)
+        pattern_score_test=mean(pattern_score_test,na.rm = T)
+        pattern_score_train=mean(pattern_score_train,na.rm = T)
+        
+        pred_score=predictionScore(curData$loc,simulation$cell_loc)
+        res=rbind(res,
+                          data.frame(normalization=curData$funcName[1],
+                                     distance=curData$funcName[2],
+                                     pattern=paste0(curData$funcName[3+j-1],"(",curData$p_parm,")"),
+                                     pattern_score_train=pattern_score_train,
+                                     pattern_score_test=pattern_score_test
+                                     ,prediction_score=pred_score)
+        )
+      }
+      res
     }
   }else
     for(i in 1:length(dataList)){
       curData=dataList[[i]]
-      curData=predict_all(curData)
-      pattern_score_test=patternScore(curData$pattern,simulation$patternData$dropTable,curData$refNum+1,curData$geneNum)
-      pattern_score_train=patternScore(curData$pattern,simulation$patternData$dropTable,1,curData$refNum)
-      pattern_score_test=mean(pattern_score_test,na.rm = T)
-      pattern_score_train=mean(pattern_score_train,na.rm = T)
-      pred_score=predictionScore(curData$loc,simulation$cell_loc)
-      pred_score=pred_score
-      performance=rbind(performance,data.frame(normalization=curData$funcName[1],
-                                               distance=curData$funcName[2],
-                                               pattern=curData$funcName[3],
-                                               pattern_score_train=pattern_score_train,
-                                               pattern_score_test=pattern_score_test,
-                                               prediction_score=pred_score))
+      curData=predict_all(curData,pattern=F)
+      patternFuncList=curData$compute_pattern
+      patternParmList=curData$p_parm
+      for(j in 1:length(patternFuncList)){
+        curData$compute_pattern=patternFuncList[[j]]
+        curData$p_parm=patternParmList[[j]]
+        curData$pattern=sapply(1:curData$geneNum,predict_pattern,mydata=curData)
+        pattern_score_test=patternScore(curData$pattern,simulation$patternData$dropTable,curData$refNum+1,curData$geneNum)
+        pattern_score_train=patternScore(curData$pattern,simulation$patternData$dropTable,1,curData$refNum)
+        pattern_score_test=mean(pattern_score_test,na.rm = T)
+        pattern_score_train=mean(pattern_score_train,na.rm = T)
+        
+        pred_score=predictionScore(curData$loc,simulation$cell_loc)
+        performance=rbind(performance,
+                  data.frame(normalization=curData$funcName[1],
+                             distance=curData$funcName[2],
+                             pattern=paste0(curData$funcName[3+j-1],"(",curData$p_parm,")"),
+                             pattern_score_train=pattern_score_train,
+                             pattern_score_test=pattern_score_test
+                             ,prediction_score=pred_score)
+        )
+      }
     }
   performance$pattern_score_train=round(performance$pattern_score_train,3)
   performance$pattern_score_test=round(performance$pattern_score_test,3)
   performance$prediction_score=round(performance$prediction_score,3)
   return(performance)
 }
+
 
 
 #predPattern=mydata$pattern

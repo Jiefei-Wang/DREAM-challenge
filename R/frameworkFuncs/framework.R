@@ -43,7 +43,7 @@ rm("DataSource")
 
 #========================Framework=======================
 #Create the dataset associated with the given functions, and function parameters
-attachFunc<-function(mydata,normalize,normalize.parm,computeDist,dist.parm,predict.pattern){
+attachFunc<-function(mydata,normalize,normalize.parm,computeDist,dist.parm,predict.pattern,pattern.parm){
   mydata$normalize=normalize
   mydata$N_parm=normalize.parm
   mydata$computeDist=computeDist
@@ -51,6 +51,7 @@ attachFunc<-function(mydata,normalize,normalize.parm,computeDist,dist.parm,predi
   #This function has been implemented, do not need to be specified by the inputs.
   mydata$pred_loc=predLocation
   mydata$compute_pattern=predict.pattern
+  mydata$p_parm=pattern.parm
   mydata
 }
 #Same as attachFunc, but the parameter can be an integer
@@ -59,9 +60,8 @@ attachFunc_list<-function(mydata,normalization,distance,pattern){
 
   model_list=list()
   for(i in 1:length(normalization))
-    for(j in 1: length(distance))
-      for(k in 1: length(pattern)){
-        model_list=c(model_list,attachFunc_hide(mydata,normalization[i],distance[j],pattern[k]))}
+    for(j in 1: length(distance)){
+        model_list=c(model_list,attachFunc_hide(mydata,normalization[i],distance[j],pattern))}
   model_list
 }
 attachFunc_hide<-function(mydata,normalization,distance,pattern){
@@ -77,9 +77,9 @@ attachFunc_hide<-function(mydata,normalization,distance,pattern){
     distance=paste0("computeDist_",getDistFuncs()[distance],collapse = "")
   
   if(is.character(pattern)){
-    pattern=paste0("computePattern_",pattern,collapse = "")
+    pattern=paste0("computePattern_",pattern)
   }else
-    pattern=paste0("computePattern_",getPatternFuncs()[pattern],collapse = "")
+    pattern=paste0("computePattern_",getPatternFuncs()[pattern])
 
   #Obtain the function parameters
   normalization_parm_fun=getFunParms(normalization)
@@ -92,16 +92,36 @@ attachFunc_hide<-function(mydata,normalization,distance,pattern){
     distance_parm=list(0)
   }else
     distance_parm=do.call(distance_parm_fun,args = list())
+  pattern_parm_list=list()
+  pattern_list=c()
+  pattern_name_list=c()
+  for(i in 1:length(pattern)){
+    pattern_parm_fun=getFunParms(pattern[i])
+    if(is.null(pattern_parm_fun)){
+      pattern_parm_list=c(pattern_parm_list,list(0))
+      pattern_list=c(pattern_list,get(pattern[i]))
+      pattern_name_list=c(pattern_name_list,pattern[i])
+    }else{
+      pattern_parm=do.call(pattern_parm_fun,args = list())
+      pattern_parm_list=c(pattern_parm_list,pattern_parm)
+      for(j in 1:length(pattern_parm)){
+        pattern_list=c(pattern_list,get(pattern[i]))
+        pattern_name_list=c(pattern_name_list,pattern[i])
+      }
+    }
+  }
+  
+  
   #Make a data list
   mydata_list=list()
   k=1
   for (i in 1:length(normalization_parm)) {
     for (j in 1:length(distance_parm)) {
       mydata_single = attachFunc(mydata,get(normalization),normalization_parm[[i]],
-                                 get(distance),distance_parm[[j]],get(pattern))
+                                 get(distance),distance_parm[[j]],pattern_list,pattern_parm_list)
       mydata_single$funcName=c(gsub("normalize_","",normalization,fixed = T),
                                gsub("computeDist_","",distance,fixed = T),
-                               gsub("computePattern_","",pattern,fixed = T))
+                               gsub("computePattern_","",pattern_name_list,fixed = T))
       mydata_list[[k]] = mydata_single
       k = k + 1
     }
@@ -123,11 +143,12 @@ pred_loc<-function(mydata){
 predict_pattern<-function(mydata,gene){
   mydata$compute_pattern(mydata,gene)
 }
-predict_all<-function(mydata){
+predict_all<-function(mydata,pattern=T){
 mydata=normalize(mydata)
 mydata=compute_dist(mydata)
 mydata=pred_loc(mydata)
-mydata$pattern=sapply(1:mydata$geneNum,predict_pattern,mydata=mydata)
+if(pattern)
+  mydata$pattern=sapply(1:mydata$geneNum,predict_pattern,mydata=mydata)
 mydata
 }
 

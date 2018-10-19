@@ -26,13 +26,14 @@ getPatternFuncs()
 
 #attach function to the data and compute the performance
 #The parameter can be the function name or the index of the function obtained from the above three functions
-modelList=attachFunc_list(mydata,normalization=c("IndividualCellIntensity","IndividualGeneIntensity","LogIndividualGeneIntensity","Mingmei","quantile","scale","TMM","upqu"),
+modelList=attachFunc_list(mydata,normalization=c("GIWC","GIAC","LogGIAC","Mingmei","quantile","scale","TMM","upqu"),
                            distance=c("cov","mcc","mse"),
                            pattern=c("simple1","author"))
 #modelList=c(modelList,attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),pattern=c("simple1","author")))
 
-modelList=attachFunc_list(mydata,normalization=c("IndividualCellIntensity"),distance=c("cov"),pattern=c("author"))
+modelList=attachFunc_list(mydata,normalization=c("GIWC"),distance=c("cov"),pattern=c("author"))
 modelList=c(modelList,attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),pattern=c("author")))
+modelList=attachFunc_list(mydata,normalization=c("GIWC"),distance=c("cov"),pattern=c("simple1","author"))
 
 #Compute the performance
 result=computePerformance(modelList,simulation,parallel=T)
@@ -41,6 +42,8 @@ result[order(result$prediction_score,decreasing=T),]
 #The relationship between scores
 result$model=factor(paste(result$normalization,result$distance,sep="+"))
 ggplot(result, aes(x=prediction_score, y=pattern_score_test,color=model)) + geom_point()+facet_grid(. ~ pattern)
+
+
 
 
 

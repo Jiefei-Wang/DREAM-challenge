@@ -7,20 +7,20 @@ normalize_scale<-function(mydata){
   return(mydata)
 }
 
-normalize_IndividualCellIntensity <- function(mydata){
-  mydata$N_drop <- mydata$drop/colSums(mydata$drop)
+normalize_GIWC <- function(mydata){
+  mydata$N_drop <- sweep(mydata$drop,2,colSums(mydata$drop),"/")
   mydata$N_insitu <- mydata$insitu
   return(mydata)
 }
 
 
-normalize_LogIndividualGeneIntensity <- function(mydata){
+normalize_LogGIAC <- function(mydata){
   mydata$N_drop <- log2(1+sweep(mydata$drop,1,apply(mydata$drop,1,max),"/"))
   mydata$N_insitu <- log2(1+mydata$insitu)
   return(mydata)
 }
 
-normalize_IndividualGeneIntensity <- function(mydata){
+normalize_GIAC <- function(mydata){
   mydata$N_drop <- sweep(mydata$drop,1,apply(mydata$drop,1,max),"/")
   mydata$N_insitu <- mydata$insitu
   #sweep(mydata$insitu,2,apply(mydata$insitu,2,max),"/")
@@ -50,8 +50,8 @@ normalize_upqu <- function(mydata){
 }
 
 get_parm_upqu <- function(param){
-  n=40
-  return(as.list(seq(1,n-1,by=2)/n))
+  n=20
+  return(as.list(seq(1,n-1)/n))
 }
 
 normalize_quantile<-function(mydata){
@@ -67,8 +67,8 @@ normalize_quantile<-function(mydata){
 }
 
 get_parm_quantile<-function(){
-  n=10
-  return(as.list(seq(1,n-1,by=2)/n))
+  n=20
+  return(as.list(seq(1,n-1)/n))
 }
 
 normalize_Mingmei <- function(mydata){

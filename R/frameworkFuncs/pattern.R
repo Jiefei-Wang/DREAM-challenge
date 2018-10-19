@@ -23,7 +23,7 @@ computePattern_simple1<-function(mydata,gene){
 
 
 computePattern_author<-function(mydata, gene) {
-  threshold=0.75
+  threshold=mydata$p_parm
   gene.expr <- mydata$drop[gene,]
   m=max(mydata$distance)
   b1 <- sweep(m-mydata$distance, 2, gene.expr, '*')
@@ -34,4 +34,10 @@ computePattern_author<-function(mydata, gene) {
   q <- q/(1+q)
   q[q < quantile(q, threshold)] <- 0
   return (q)
+}
+
+get_parm_author<-function(){
+  n=10
+  #return(as.list(seq(1,n-1)/n))
+  return(list(0.5,0.6,0.7,0.8))
 }
