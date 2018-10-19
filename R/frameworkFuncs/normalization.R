@@ -1,52 +1,39 @@
 #install.packages("Rfast")
 #install.packages("rpgm")
 
-
-
 normalize_scale<-function(mydata){
   mydata$N_insitu=t(scale(t(scale(mydata$insitu))))
-  mydata$N_drop=t(scale(t(scale(mydata$drop))))
+  mydata$N_drop=scale(t(scale(t(mydata$drop))))
   return(mydata)
 }
 
-normalize_columnSum <- function(mydata){
+normalize_IndividualCellIntensity <- function(mydata){
   mydata$N_drop <- mydata$drop/colSums(mydata$drop)
   mydata$N_insitu <- mydata$insitu
   return(mydata)
 }
 
 
-normalize_rowMaxlog <- function(mydata){
-  
-  
-  mydata$N_drop <- log2(1+mydata$drop/apply(mydata$drop,1,max))
-  
+normalize_LogIndividualGeneIntensity <- function(mydata){
+  mydata$N_drop <- log2(1+sweep(mydata$drop,1,apply(mydata$drop,1,max),"/"))
   mydata$N_insitu <- log2(1+mydata$insitu)
-  
-  
   return(mydata)
 }
-normalize_rowMax <- function(mydata){
-  
-  
-  mydata$N_drop <- mydata$drop/apply(mydata$drop,1,max)
-  
+
+normalize_IndividualGeneIntensity <- function(mydata){
+  mydata$N_drop <- sweep(mydata$drop,1,apply(mydata$drop,1,max),"/")
   mydata$N_insitu <- mydata$insitu
-  
-  
+  #sweep(mydata$insitu,2,apply(mydata$insitu,2,max),"/")
   return(mydata)
 }
+
+
 normalize_TMM <- function(mydata){
   normfac_drop <- calcNormFactors(mydata$drop)
-  
   mydata$N_drop<- sweep(mydata$drop,2,normfac_drop,"/")
-  
   normfac_insitu <- calcNormFactors(mydata$insitu)
-  
   mydata$N_insitu <-sweep(mydata$insitu,2,normfac_insitu,"/")
-  
-                        
- return(mydata)
+  return(mydata)
 }
 
 
@@ -61,6 +48,7 @@ normalize_upqu <- function(mydata){
   mydata$N_drop <- sweep(mydata$drop,1,quantileExpressed,"/")
   return(mydata)  
 }
+
 get_parm_upqu <- function(param){
   n=40
   return(as.list(seq(1,n-1,by=2)/n))
@@ -83,18 +71,10 @@ get_parm_quantile<-function(){
   return(as.list(seq(1,n-1,by=2)/n))
 }
 
-
 normalize_Mingmei <- function(mydata){
-  
   factor1 <- colSums(mydata$drop)/max(colSums(mydata$drop))
-  
   factor2 <- rowSums(mydata$insitu)/max(rowSums(mydata$insitu))
-  
   mydata$N_drop <- log(1+sweep(mydata$drop, 2, factor1, "/"))
-  
   mydata$N_insitu <- log(1+sweep(mydata$insitu, 1, factor2, "/"))
-  
   return(mydata)
-  
 }
-
