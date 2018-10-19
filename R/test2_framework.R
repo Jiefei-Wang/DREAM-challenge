@@ -31,7 +31,7 @@ getPatternFuncs()
 
 #modelList=attachFunc_list(simData,normalization=c("upqu"),distance=c("cov"),pattern=c("author"))
 
-modelList=attachFunc_list(simData,normalization=c("rowMax","Mingmei"),distance=c("cov","mse"),pattern=c("author"))
+modelList=attachFunc_list(simData,normalization=c("rowMax","Mingmei"),distance=c("cov","mse"),pattern=c("simple1"))
 
 
 
