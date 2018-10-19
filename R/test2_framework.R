@@ -26,19 +26,20 @@ getPatternFuncs()
 
 #attach function to the data and compute the performance
 #The parameter can be the function name or the index of the function obtained from the above three functions
-mydataList=attachFunc_list(mydata,normalization=c("IndividualCellIntensity","IndividualGeneIntensity","LogIndividualGeneIntensity","Mingmei","quantile","scale","TMM","upqu"),
+modelList=attachFunc_list(mydata,normalization=c("IndividualCellIntensity","IndividualGeneIntensity","LogIndividualGeneIntensity","Mingmei","quantile","scale","TMM","upqu"),
                            distance=c("cov","mcc","mse"),
                            pattern=c("simple1","author"))
-#mydataList=c(mydataList,attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),pattern=c("simple1","author")))
+#modelList=c(modelList,attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),pattern=c("simple1","author")))
 
-mydataList=attachFunc_list(mydata,normalization=c("IndividualCellIntensity"),distance=c("cov"),pattern=c("author"))
+modelList=attachFunc_list(mydata,normalization=c("IndividualCellIntensity"),distance=c("cov"),pattern=c("author"))
+modelList=c(modelList,attachFunc_list(mydata,normalization=c("upqu"),distance=c("cov"),pattern=c("author")))
 
 #Compute the performance
-result=computePerformance(mydataList,simulation,parallel=T)
-result$model=factor(paste(result$normalization,result$distance,sep="+"))
+result=computePerformance(modelList,simulation,parallel=T)
 result[order(result$prediction_score,decreasing=T),]
 
 #The relationship between scores
+result$model=factor(paste(result$normalization,result$distance,sep="+"))
 ggplot(result, aes(x=prediction_score, y=pattern_score_test,color=model)) + geom_point()+facet_grid(. ~ pattern)
 
 
@@ -51,15 +52,15 @@ dm_list=originalMethod(mydata,simulation)
 dm_list$score
 
 #Let's see one pattern
-mydata=mydataList[[1]]
+mydata=modelList[[17]]
 mydata=predict_all(mydata)
 mean(patternScore(mydata$pattern,simulation$patternData$dropTable,refNum+1,geneNum))
 mean(predictionScore(mydata$loc,simulation$cell_loc))
 
 #The pattern of a gene
-gene=62
-intensityPlot2(simulation$patternData$dropTable[,gene],geometry,title="true pattern")
-intensityPlot2(mydata$pattern[,gene],geometry,title="predicted pattern")
+gene=100
+intensityPlot(simulation$patternData$dropTable[,gene],geometry,title="true pattern")
+intensityPlot(mydata$pattern[,gene],geometry,title="predicted pattern")
 intensityPlot2(dm_list$pattern[,gene],geometry,title="predicted pattern, author's method")
 
 

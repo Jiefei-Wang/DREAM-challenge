@@ -67,7 +67,7 @@ normalize_quantile<-function(mydata){
 }
 
 get_parm_quantile<-function(){
-  n=40
+  n=10
   return(as.list(seq(1,n-1,by=2)/n))
 }
 

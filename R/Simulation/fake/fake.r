@@ -55,11 +55,11 @@ createPattern<-function(geometry,geneNum,refNum,parms){
     parms$dispersion_y=parms$dispersion_y
   truePattern=createTruePattern_circle(geometry,parms)
   #if it is reference gene, add variation
-  if(i<=refNum){
+  #if(i<=refNum){
     truePattern=truePattern*2+runif(nrow(geometry),-parms$refGeneSignal,parms$refGeneSignal)
     truePattern[truePattern<0]=0
     truePattern[truePattern>1]=1
-  }
+  #}
   dropPattern=createdropSeqPattern(truePattern,parms)
   trueTable[,i]=truePattern
   dropTable[,i]=dropPattern
