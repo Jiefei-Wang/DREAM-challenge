@@ -12,7 +12,7 @@ dm <- mapCells(dm)
 
 gene.name.list=rownames(chanllege.data$dropSeq.raw)
 ref.name.list=colnames(chanllege.data$insitu.raw)
-gene.name="Hsp83"
+gene.name="odd"
 
 if(!gene.name%in%gene.name.list)
   stop("The gene is not in the drop sequence data")
