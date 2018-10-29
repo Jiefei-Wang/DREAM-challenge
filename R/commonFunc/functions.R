@@ -65,5 +65,21 @@ originalMethod<-function(mydata,simulation){
              pattern_score=mean(dm_pattern_score),prediction_score=dm_pred_score))
 }
 
+# 
+# sweep2<-function(X,MARGIN,STATS,FUN){
+#   if(FUN=="*"||FUN=="/"||FUN=="+"||FUN=="-"){
+#     if(MARGIN==1){
+#       Exp=paste0("X",FUN,"STATS")
+#       return(eval(parse(text=Exp)))
+#     }
+#     if(MARGIN==2){
+#       Exp=paste0("t(t(X)",FUN,"STATS)")
+#       return(eval(parse(text=Exp)))
+#     }
+#   }
+#   sweep(X,MARGIN,STATS,FUN)
+# }
+
+
 
 

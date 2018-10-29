@@ -18,3 +18,5 @@ colnames(geometry)=c("x","y","z")
 
 load("R\\commonFunc\\GeneData.RData")
 
+
+geometry=chanllege.data$geometry

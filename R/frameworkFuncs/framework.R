@@ -1,12 +1,8 @@
 library(doParallel)
 for(pkg in clusterPkg)
   library(pkg,character.only=T)
+clusterExport(cl,"geometry")
 
-if(exists("cl",parent.frame())){
-  try(stopCluster(cl))
-}
-cl <- makePSOCKcluster(clusterNum)
-registerDoParallel(cl)
 
 #========================Read functions into a namespace=======================
 for(env in search()){
@@ -43,28 +39,29 @@ rm("DataSource")
 
 #========================Framework=======================
 #Create the dataset associated with the given functions, and function parameters
-attachFunc<-function(mydata,normalize,normalize.parm,computeDist,dist.parm,predict.pattern,pattern.parm){
-  mydata$normalize=normalize
-  mydata$N_parm=normalize.parm
-  mydata$computeDist=computeDist
-  mydata$d_parm=dist.parm
+attachFunc<-function(normalize,normalize.parm,computeDist,dist.parm,predict.pattern,pattern.parm){
+  model=list()
+  model$normalize=normalize
+  model$N_parm=normalize.parm
+  model$computeDist=computeDist
+  model$d_parm=dist.parm
   #This function has been implemented, do not need to be specified by the inputs.
-  mydata$pred_loc=predLocation
-  mydata$compute_pattern=predict.pattern
-  mydata$p_parm=pattern.parm
-  mydata
+  model$pred_loc=predLocation
+  model$compute_pattern=predict.pattern
+  model$p_parm=pattern.parm
+  model
 }
 #Same as attachFunc, but the parameter can be an integer
 #The attached function's paramter will be automatically find
-attachFunc_list<-function(mydata,normalization,distance,pattern){
+attachFunc_list<-function(normalization,distance,pattern){
 
   model_list=list()
   for(i in 1:length(normalization))
     for(j in 1: length(distance)){
-        model_list=c(model_list,attachFunc_hide(mydata,normalization[i],distance[j],pattern))}
+        model_list=c(model_list,attachFunc_hide(normalization[i],distance[j],pattern))}
   model_list
 }
-attachFunc_hide<-function(mydata,normalization,distance,pattern){
+attachFunc_hide<-function(normalization,distance,pattern){
   #Check the input
   if(is.character(normalization)){
     normalization=paste0("normalize_",normalization,collapse = "")
@@ -113,25 +110,26 @@ attachFunc_hide<-function(mydata,normalization,distance,pattern){
   
   
   #Make a data list
-  mydata_list=list()
+  model_list=list()
   k=1
   for (i in 1:length(normalization_parm)) {
     for (j in 1:length(distance_parm)) {
-      mydata_single = attachFunc(mydata,get(normalization),normalization_parm[[i]],
+      single_model = attachFunc(get(normalization),normalization_parm[[i]],
                                  get(distance),distance_parm[[j]],pattern_list,pattern_parm_list)
-      mydata_single$funcName=c(gsub("normalize_","",normalization,fixed = T),
+      single_model$funcName=c(gsub("normalize_","",normalization,fixed = T),
                                gsub("computeDist_","",distance,fixed = T),
                                gsub("computePattern_","",pattern_name_list,fixed = T))
-      mydata_list[[k]] = mydata_single
+      model_list[[k]] = single_model
       k = k + 1
     }
   }
-  return(mydata_list)
+  return(model_list)
 }
 
 
 
-normalize<-function(mydata){
+normalize<-function(model,geneData){
+  mydata=c(geneData,model)
   mydata$normalize(mydata)
 }
 compute_dist<-function(mydata){
@@ -140,16 +138,28 @@ compute_dist<-function(mydata){
 pred_loc<-function(mydata){
   mydata$pred_loc(mydata)
 }
-predict_pattern<-function(mydata,gene){
-  mydata$compute_pattern(mydata,gene)
+
+predict_pattern<-function(mydata,patternInd){
+  patternFuncList=mydata$compute_pattern
+  curPatternFunc=patternFuncList[[patternInd]]
+  curPatternParm=mydata$p_parm[[patternInd]]
+  mydata$compute_pattern=curPatternFunc
+  mydata$p_parm=curPatternParm
+  for(i in 1:mydata$geneNum){
+    mydata=mydata$compute_pattern(mydata,i)
+  }
+  mydata$patternModel=paste0(mydata$funcName[3+patternInd-1],"(",curPatternParm,")")
+  mydata
 }
-predict_all<-function(mydata,pattern=T){
-mydata=normalize(mydata)
+predict_all<-function(model,geneData,pattern=T,patternInd=1){
+mydata=normalize(model,geneData)
 mydata=compute_dist(mydata)
 mydata=pred_loc(mydata)
-if(pattern)
-  mydata$pattern=sapply(1:mydata$geneNum,predict_pattern,mydata=mydata)
-mydata
+if(!pattern)
+  return(mydata)
+  
+mydata=predict_pattern(mydata,patternInd)
+return(mydata)
 }
 
 
