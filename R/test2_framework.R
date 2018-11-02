@@ -1,11 +1,12 @@
 #install.packages("Rfast")
 #install.packages("rpgm")
+#install.packages("rpgm")
 #BiocManager::install("edgeR")
 library(doParallel)
 library(ggplot2) 
 library(tictoc)
 #Set the number of the clusters and the packages that will be export to the clusters.
-clusterNum=10
+clusterNum=4
 clusterPkg=c("np","rpgm","Rfast","edgeR")
 source("R\\commonFunc\\createCluster.R")
 source("R\\commonFunc\\readData.R")
