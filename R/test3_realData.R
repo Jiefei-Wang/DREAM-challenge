@@ -42,7 +42,7 @@ modelList=attachFunc_list(normalization=c("GIWC","GIAC"),distance=c("cov"),patte
 
 #Compute the performance
 tic()
-result=computePerformance(modelList,geneData,simulation,parallel=F)
+result=computePerformance(modelList,geneData,simulation,parallel=T)
 toc()
 result[order(result$prediction_score,decreasing=T),1:6]
 
