@@ -15,7 +15,7 @@ computePerformance<-function(modelList,geneData,simulation,parallel){
       patternFuncList=curModel$compute_pattern
       for(j in 1:length(patternFuncList)){
         curModel$tmp_pattern=NULL
-        curModel=predict_pattern(curModel,patternInd=j)
+        curModel=predict_pattern(curModel,patternInd=j,curModel$refNum)
         res=rbind(res,getSummaryScore(curModel,simulation))
       }
       res
@@ -29,21 +29,21 @@ computePerformance<-function(modelList,geneData,simulation,parallel){
       
       for(j in 1:length(patternFuncList)){
         curModel$tmp_pattern=NULL
-        curModel=predict_pattern(curModel,patternInd=j)
+        curModel=predict_pattern(curModel,patternInd=j,curModel$refNum)
         performance=rbind(performance,getSummaryScore(curModel,simulation))
       }
     }
   }
   performance$pattern_score_train=round(performance$pattern_score_train,3)
-  performance$pattern_score_test=round(performance$pattern_score_test,3)
+  #performance$pattern_score_test=round(performance$pattern_score_test,3)
   performance$prediction_score=round(performance$prediction_score,3)
   return(performance)
 }
 
 getSummaryScore<-function(mydata,simulation){
-  pattern_score_test=patternScore(mydata$pattern,simulation$patternData$dropTable,mydata$refNum+1,mydata$geneNum)
+  #pattern_score_test=patternScore(mydata$pattern,simulation$patternData$dropTable,mydata$refNum+1,mydata$geneNum)
   pattern_score_train=patternScore(mydata$pattern,simulation$patternData$dropTable,1,mydata$refNum)
-  pattern_score_test=mean(pattern_score_test,na.rm = T)
+  #pattern_score_test=mean(pattern_score_test,na.rm = T)
   pattern_score_train=mean(pattern_score_train,na.rm = T)
   
   pred_score=predictionScore(mydata$loc,simulation$cell_loc)
@@ -52,7 +52,7 @@ getSummaryScore<-function(mydata,simulation){
                        distance=mydata$funcName[2],
                        pattern=mydata$patternModel,
                        pattern_score_train=pattern_score_train,
-                       pattern_score_test=pattern_score_test,
+                       #pattern_score_test=pattern_score_test,
                        prediction_score=pred_score,
                  normalization_parm=paste0(mydata$N_parm,collapse = "+"),
                  distance_parm=paste0(mydata$d_parm,collapse = "+"),
@@ -63,10 +63,10 @@ getSummaryScore<-function(mydata,simulation){
 
 #predPattern=mydata$pattern
 #truePattern=simulation$patternData$dropTable
-#gene_start=51
-#gene_end=100
+#gene_start=1
+#gene_end=84
 
-patternScore<-function(predPattern,truePattern,gene_start,gene_end){
+patternScore1<-function(predPattern,truePattern,gene_start,gene_end){
   turning=0.01
   weight=1
   predPattern=matrix(predPattern[,gene_start:gene_end],nrow(predPattern))
@@ -89,7 +89,7 @@ patternScore<-function(predPattern,truePattern,gene_start,gene_end){
 }
 
 
-patternScore1<-function(predPattern,truePattern,gene_start,gene_end){
+patternScore<-function(predPattern,truePattern,gene_start,gene_end){
   turning=0.01
   predPattern=matrix(predPattern[,gene_start:gene_end],nrow(predPattern))
   truePattern=matrix(truePattern[,gene_start:gene_end],nrow(predPattern))

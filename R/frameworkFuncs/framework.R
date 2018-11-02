@@ -139,13 +139,13 @@ pred_loc<-function(mydata){
   mydata$pred_loc(mydata)
 }
 
-predict_pattern<-function(mydata,patternInd){
+predict_pattern<-function(mydata,patternInd,gene.end=mydata$geneNum){
   patternFuncList=mydata$compute_pattern
   curPatternFunc=patternFuncList[[patternInd]]
   curPatternParm=mydata$p_parm[[patternInd]]
   mydata$compute_pattern=curPatternFunc
   mydata$p_parm=curPatternParm
-  for(i in 1:mydata$geneNum){
+  for(i in 1:gene.end){
     mydata=mydata$compute_pattern(mydata,i)
   }
   mydata$patternModel=paste0(mydata$funcName[3+patternInd-1],"(",curPatternParm,")")
