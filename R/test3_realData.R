@@ -11,7 +11,7 @@ source("R\\frameworkFuncs\\framework.R")
 source("R\\commonFunc\\authorsData.R")
 
 
-simulation$patternData$dropTable=as.matrix(simulation$patternData$trueTable)
+simulation$patternData$dropTable=as.matrix(simulation$patternData$dropTable)
 simulation$simData$insitu=as.matrix(simulation$simData$insitu)
 simulation$simData$drop=as.matrix(simulation$simData$drop)
 geneData=simulation$simData
