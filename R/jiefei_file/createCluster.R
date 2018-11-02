@@ -5,11 +5,11 @@ if(exists("cl")){
   try(stopCluster(cl=cl),silent=T)
 }
 
-
+master="192.168.1.48"
 
 machineAddresses <- list(
-  list(host='localhost',ncore=10)
-  ,list(host='192.168.1.230',user='jeff',rscript="Rscript",rshcmd="plink -pw qwer",
+  list(host='localhost',ncore=10),
+  list(host='192.168.1.230',user='jeff',rscript="Rscript",rshcmd="plink -pw qwer",
         ncore=40)
   # ,list(host='192.168.1.220',user='jeff',rscript="Rscript",rshcmd="plink -pw qwer",
   #      ncore=4)
@@ -32,10 +32,12 @@ spec <- lapply(machineAddresses,
                    rep(list(list(host=machine$host)),
                        machine$ncore)
                  else
-                   rep(list(list(host=machine$host,
+                   rep(list(list(master=master,
+                                 host=machine$host,
                                  user=machine$user,
                                  rscript=machine$rscript,
-                                 rshcmd=machine$rshcmd)),
+                                 rshcmd=machine$rshcmd
+                                 )),
                        machine$ncore)
                })
 spec <- unlist(spec,recursive=FALSE)

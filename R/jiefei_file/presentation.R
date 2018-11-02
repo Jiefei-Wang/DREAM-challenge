@@ -1,4 +1,4 @@
-
+library(ggplot2)
 
 result$model=gsub("_"," ",factor(paste(result$normalization,result$distance,sep="+")),fixed=T)
 ggplot(result, aes(x=prediction_score, y=pattern_score_test,color=model)) + 
@@ -15,8 +15,8 @@ for(i in 1:length(model)){
   #  next
   ind=which.max(tmp$pattern_score_train)
   #
- # res=data.frame(model=curModel,predict_fit=tmp[ind,]$prediction_score,predict_best=max(tmp$prediction_score))
-  res=data.frame(model=curModel,predict_best=max(tmp$prediction_score))
+ res=data.frame(model=curModel,predict_fit=tmp[ind,]$prediction_score,predict_best=max(tmp$prediction_score))
+  #res=data.frame(model=curModel,predict_best=max(tmp$prediction_score))
   #res=data.frame(model=curModel,predict_ave=mean(tmp$prediction_score),predict_fit=tmp[ind,]$prediction_score,predict_best=max(tmp$prediction_score))
   record=rbind(record,res)
 }
