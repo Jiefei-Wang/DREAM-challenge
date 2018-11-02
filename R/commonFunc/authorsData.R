@@ -50,7 +50,7 @@ geneData$insitu=insitu
 geneData$drop=drop
 simulation$simData=geneData
 
-save(simulation,file="authorData.RData")
+save(simulation,file="R\\commonFunc\\authorData.RData")
 }
 
 load("R\\commonFunc\\authorData.RData")
