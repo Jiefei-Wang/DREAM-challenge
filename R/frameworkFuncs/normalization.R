@@ -109,8 +109,13 @@ normalize_double_quantile<-function(mydata){
 
 get_parm_double_quantile<-function(){
   n=num_parm
-  parm=seq(1,n-1)/n
-  parm=as.matrix(expand.grid(parm,parm))
+  #parm1=seq(1,n-1)/n
+  #parm2=seq(1,n-1)/n
+  
+  parm1=seq(0.5,0.7,length.out = n)
+  parm2=seq(0.8,1,length.out = n)
+  
+  parm=as.matrix(expand.grid(parm1,parm2))
   parm1=list()
   for(i in 1:nrow(parm)){
     parm1[[i]]=parm[i,]
@@ -131,6 +136,57 @@ normalize_double_upqu<-function(mydata){
   mydata$N_drop <- sweep(mydata$drop,2,quantileExpressed,"/")
   return(mydata) 
 }
+
+normalize_autoCluster<-function(mydata){
+  mydata$N_insitu=apply(mydata$insitu,2,function(x){
+    fit=kmeans(x,2)
+    gmean=aggregate(x,by=list(fit$cluster),FUN=mean)
+    group=fit$cluster-1
+    if(gmean[1,2]>gmean[2,2]) 
+    {
+      group=1-group
+    }
+    group
+  })
+  
+  mydata$N_drop=t(
+    sapply(1:mydata$refNum,function(i,insitu,drop){
+    sigNum=mean(insitu[,i])
+    drop_data=drop[i,]
+    drop_data>quantile(drop_data,sigNum)
+  },insitu=mydata$N_insitu,drop=mydata$drop)
+  )
+  
+  mydata
+}
+
+
+normalize_doubleAutoCluster<-function(mydata){
+  mydata$N_insitu=apply(mydata$insitu,2,function(x){
+    fit=kmeans(x,2)
+    gmean=aggregate(x,by=list(fit$cluster),FUN=mean)
+    group=fit$cluster-1
+    if(gmean[1,2]>gmean[2,2]) 
+    {
+      group=1-group
+    }
+    group
+  })
+  mydata$N_drop=apply(mydata$drop[1:mydata$refNum,],1,function(x){
+    fit=kmeans(x,2)
+    gmean=aggregate(x,by=list(fit$cluster),FUN=mean)
+    group=fit$cluster-1
+    if(gmean[1,2]>gmean[2,2]) 
+    {
+      group=1-group
+    }
+    group
+  })
+  
+  
+  mydata
+}
+
 
 get_parm_double_upqu<-function(){
   get_parm_double_quantile()

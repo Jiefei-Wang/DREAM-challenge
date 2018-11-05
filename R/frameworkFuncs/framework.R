@@ -139,16 +139,30 @@ pred_loc<-function(mydata){
   mydata$pred_loc(mydata)
 }
 
+predLocation<-function(mydata){
+  predict_num=10
+  #Compute the rank
+  rank_distance=apply(mydata$distance,2,rank,ties.method="random")
+  ind=which(rank_distance<=predict_num,arr.ind=T)
+  sort_order=apply(matrix(rank_distance[ind],nrow=predict_num),2,order)
+  loc=matrix(ind[,1],nrow=predict_num)
+  mydata$loc=sapply(1:ncol(loc),function(i,loc,ind){
+    loc[ind[,i],i]
+  },loc=loc,ind=sort_order)
+  return(mydata)
+}
+
 predict_pattern<-function(mydata,patternInd,gene.end=mydata$geneNum){
   patternFuncList=mydata$compute_pattern
-  curPatternFunc=patternFuncList[[patternInd]]
-  curPatternParm=mydata$p_parm[[patternInd]]
-  mydata$compute_pattern=curPatternFunc
-  mydata$p_parm=curPatternParm
+  parmList=mydata$p_parm
+  mydata$compute_pattern=patternFuncList[[patternInd]]
+  mydata$p_parm=parmList[[patternInd]]
   for(i in 1:gene.end){
     mydata=mydata$compute_pattern(mydata,i)
   }
-  mydata$patternModel=paste0(mydata$funcName[3+patternInd-1],"(",curPatternParm,")")
+  mydata$patternModel=paste0(mydata$funcName[3+patternInd-1],"(",mydata$p_parm,")")
+  mydata$compute_pattern=patternFuncList
+  mydata$p_parm=parmList
   mydata
 }
 predict_all<-function(model,geneData,pattern=T,patternInd=1){

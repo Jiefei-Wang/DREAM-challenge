@@ -6,7 +6,7 @@ library(doParallel)
 library(ggplot2) 
 library(tictoc)
 #Set the number of the clusters and the packages that will be export to the clusters.
-clusterNum=4
+clusterNum=10
 clusterPkg=c("np","rpgm","Rfast","edgeR")
 source("R\\commonFunc\\createCluster.R")
 source("R\\commonFunc\\readData.R")
@@ -93,7 +93,7 @@ k=20
 which(k+5>ind&ind>k)
 
 
-cell=69
+cell=2
 loc=simulation$cell_loc[cell]
 intensityPlot2(max(mymodel$distance[,cell])-mymodel$distance[,cell],geometry,title="Dist")
 points(geometry$x[loc],geometry$z[loc],col="blue",pch=20,cex=1)

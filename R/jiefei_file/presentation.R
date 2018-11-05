@@ -1,7 +1,7 @@
 library(ggplot2)
 
 result$model=gsub("_"," ",factor(paste(result$normalization,result$distance,sep="+")),fixed=T)
-ggplot(result, aes(x=prediction_score, y=pattern_score_test,color=model)) + 
+ggplot(result, aes(x=prediction_score, y=pattern_score_train,color=model)) + 
   geom_point()+guides(color=guide_legend(ncol=2))+labs(x="Prediction score", y="Pattern score")
 
 

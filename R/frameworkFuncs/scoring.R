@@ -42,7 +42,7 @@ computePerformance<-function(modelList,geneData,simulation,parallel){
 
 getSummaryScore<-function(mydata,simulation){
   #pattern_score_test=patternScore(mydata$pattern,simulation$patternData$dropTable,mydata$refNum+1,mydata$geneNum)
-  pattern_score_train=patternScore(mydata$pattern,simulation$patternData$dropTable,1,mydata$refNum)
+  pattern_score_train=patternScore(mydata$pattern,mydata$insitu,1,mydata$refNum)
   #pattern_score_test=mean(pattern_score_test,na.rm = T)
   pattern_score_train=mean(pattern_score_train,na.rm = T)
   
@@ -129,18 +129,6 @@ patternScore1<-function(predPattern,truePattern,gene_start,gene_end){
   return(score)
 }
 
-predLocation<-function(mydata){
-  predict_num=10
-  #Compute the rank
-  rank_distance=apply(mydata$distance,2,rank,ties.method="random")
-  ind=which(rank_distance<=predict_num,arr.ind=T)
-  sort_order=apply(matrix(rank_distance[ind],nrow=predict_num),2,order)
-  loc=matrix(ind[,1],nrow=predict_num)
-  mydata$loc=sapply(1:ncol(loc),function(i,loc,ind){
-    loc[ind[,i],i]
-  },loc=loc,ind=sort_order)
-  return(mydata)
-}
 
 
 
