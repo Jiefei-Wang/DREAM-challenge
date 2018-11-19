@@ -109,11 +109,11 @@ normalize_double_quantile<-function(mydata){
 
 get_parm_double_quantile<-function(){
   n=num_parm
-  #parm1=seq(1,n-1)/n
-  #parm2=seq(1,n-1)/n
+  parm1=seq(1,n-1)/n
+  parm2=seq(1,n-1)/n
   
-  parm1=seq(0.5,0.7,length.out = n)
-  parm2=seq(0.8,1,length.out = n)
+  #parm1=seq(0.5,0.7,length.out = n)
+  #parm2=seq(0.8,1,length.out = n)
   
   parm=as.matrix(expand.grid(parm1,parm2))
   parm1=list()
@@ -190,5 +190,87 @@ normalize_doubleAutoCluster<-function(mydata){
 
 get_parm_double_upqu<-function(){
   get_parm_double_quantile()
+}
+
+normalize_autoCluster_quantile<-function(mydata){
+  parm=mydata$N_parm
+  mydata$N_insitu=apply(mydata$insitu,2,function(x){
+    fit=kmeans(x,2)
+    gmean=aggregate(x,by=list(fit$cluster),FUN=mean)
+    group=fit$cluster-1
+    if(gmean[1,2]>gmean[2,2]) 
+    {
+      group=1-group
+    }
+    group
+  })
+  mydata$N_drop<-apply(mydata$drop,1,function(x){as.integer(x>quantile(x,parm))})
+  
+  if(sum(abs(dim(mydata$N_drop)-dim(mydata$drop)))!=0)
+    mydata$N_drop=t(mydata$N_drop)
+  mydata
+}
+get_parm_autoCluster_quantile<-function(){
+  get_parm_quantile()
+}
+
+normalize_dropClusterOnly_parm<-function(mydata){
+  parm=mydata$N_parm
+  N_driver=ncol(mydata$insitu)
+  mydata$N_insitu=mydata$insitu
+  tmp=mydata$drop[1:N_driver,]
+  
+  #quantileExpressed <- apply(tmp, 2, function(x){quantile(x[x>0], 0.95)})
+  #tmp_norm <- sweep(tmp,2,quantileExpressed,"/")
+  tmp_norm=tmp
+  
+  quantileCutoff=apply(tmp_norm,1,function(x){quantile(x[x>0],parm)})
+  
+  mydata$N_drop<-sapply(1:N_driver,function(ind,gene,cutoff){as.integer(gene[ind,]>cutoff[ind])},gene=tmp_norm,cutoff=quantileCutoff)
+  
+  if(sum(abs(dim(mydata$N_drop)-dim(mydata$drop)))!=0)
+    mydata$N_drop=t(mydata$N_drop)
+  mydata
+}
+
+get_parm_dropClusterOnly_parm<-function(){
+  seq(0.1, 0.4, 0.01)
+}
+
+normalize_dropClusterOnly_wholeMatrix_parm<-function(mydata){
+  parm=mydata$N_parm
+  N_driver=ncol(mydata$insitu)
+  mydata$N_insitu=mydata$insitu
+  tmp_quantile=quantile(mydata$drop[1:N_driver,],parm)
+  tmp=as.numeric(mydata$drop>tmp_quantile)
+  mydata$N_drop=matrix(tmp,N_driver,ncol(mydata$drop))
+  if(sum(abs(dim(mydata$N_drop)-dim(mydata$drop)))!=0)
+    mydata$N_drop=t(mydata$N_drop)
+  mydata
+}
+get_parm_dropClusterOnly_wholeMatrix_parm<-function(){
+  seq(0.15, 0.5, 0.01)
+}
+
+
+normalize_dropClusterOnly<-function(mydata){
+  
+  mydata$N_insitu=mydata$insitu
+  refNum=ncol(mydata$insitu)
+  mydata$N_drop=t(
+    sapply(1:refNum,function(i,insitu,drop){
+      sigNum=mean(insitu[,i])
+      drop_data=drop[i,]
+      drop_data>quantile(drop_data,sigNum)
+    },insitu=mydata$N_insitu,drop=mydata$drop)
+  )
+  mydata$N_drop=matrix(as.numeric(mydata$N_drop),nrow(mydata$N_drop),ncol(mydata$N_drop))
+  mydata
+}
+
+normalize_noNorm<-function(mydata){
+  mydata$N_drop=mydata$drop
+  mydata$N_insitu=mydata$insitu
+  mydata
 }
 

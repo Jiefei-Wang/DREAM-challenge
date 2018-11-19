@@ -1,25 +1,34 @@
-pickGene<-function(geneData,geneNum,ind=NULL){
+pickGene<-function(geneData,geneNum=NULL,ind=NULL){
   if(is.null(ind))
-    ind=sample(1:geneData$refNum,geneNum)
-  geneData$insitu=geneData$insitu[,ind]
-  drop_ref=geneData$drop[ind,]
-  drop_nonref=geneData$drop[-ind,]
+    ind=sort(sample(1:84,geneNum))
+  if(is.numeric(ind[1])){
+    geneName=rownames(geneData$drop)[1:84]
+    geneName=geneName[ind]
+  }else{
+    geneName=ind
+  }
+  
+  geneData$insitu=geneData$insitu[,geneName]
+  
+  index=which(rownames(geneData$drop)%in%geneName)
+  drop_ref=geneData$drop[index,]
+  drop_nonref=geneData$drop[-index,]
   geneData$drop=rbind(drop_ref,drop_nonref)
  
+  geneNum=length(ind)
   geneData$refNum=geneNum
   geneData$geneNum=nrow(geneData$drop)
   geneData$cellNum=ncol(geneData$cellNum)
   geneData$geneInd=ind
+  geneData$geneName=geneName
   geneData
 }
 
 author_method<-function(chanllege.data,geneData){
   raw.data=geneData$drop
   gene.name=rownames(raw.data)
-  gene.name[gene.name=="Blimp-1"]="Blimp.1"
-  gene.name[gene.name=="E(spl)m5-HLH"]="E.spl.m5.HLH"
   data=as.matrix(chanllege.data$dropSeq.normalized[gene.name,])
-  rownames(raw.data)=gene.name
+  
   
   dm = new("DistMap",
            raw.data=raw.data,
@@ -55,4 +64,13 @@ author_pattern_method<-function(dm,gene,threshold){
   q <- q/(1+q)
   q[q < quantile(q, threshold)] <- 0
   q
+}
+
+
+findgeneInd<-function(geneName,geneList){
+  for(i in 1:length(geneName)){
+    if(!geneName[i]%in% geneList)
+      message("This gene is not in the gene list: ",geneList[i])
+  }
+  (1:length(geneList))[geneList%in% geneName]
 }

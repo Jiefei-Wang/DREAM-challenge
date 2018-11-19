@@ -41,7 +41,10 @@ computePerformance_real<-function(modelList,geneData,cell_loc,parallel){
 
 getSummaryScore_real<-function(mydata,cell_loc){
   #pattern_score_test=patternScore(mydata$pattern,simulation$patternData$dropTable,mydata$refNum+1,mydata$geneNum)
-  pattern_score_train=patternScore_SS(mydata$pattern,mydata$insitu,1,mydata$refNum)
+  geneNum=mydata$pattern_train_num
+  if(is.null(geneNum))
+    geneNum=mydata$refNum
+  pattern_score_train=patternScore_SS(mydata$pattern,mydata$insitu,1,geneNum)
   #pattern_score_test=mean(pattern_score_test,na.rm = T)
   pattern_score_train=mean(pattern_score_train,na.rm = T)
   
@@ -117,7 +120,7 @@ patternScore_cor<-function(predPattern,truePattern,gene_start,gene_end){
 #predLoc=apply(top10,2,function(x)sample(x,10))
 #trueLoc=simulation$cell_loc
 #predLoc=mydata$loc
-predictionScore<-function(predLoc,top10){
+predictionScore1<-function(predLoc,top10){
  
   ave_x=diff(range(geometry$x))/2
   ave_z=diff(range(geometry$z))/2
@@ -150,6 +153,40 @@ predictionScore<-function(predLoc,top10){
   weight=1/(1:nrow(predLoc))+1
   weight=weight/sum(weight)
   weight%*%score_final
+  # matchPos=sweep(predLoc,2,trueLoc,"==")
+  # ind=which(matchPos,arr.ind = T)
+  # sum(1/ind[,1])/length(trueLoc)
+}
+predictionScore<-function(predLoc,trueLoc){
+  ave_x=diff(range(geometry$x))/2
+  ave_z=diff(range(geometry$z))/2
+  z_inflate=ave_x/ave_z
+  
+  geometry_tmp=geometry
+  geometry_tmp$z=geometry_tmp$z*z_inflate
+  coordinate_x=matrix(geometry_tmp[predLoc,"x"],nrow=10)
+  coordinate_z=matrix(geometry_tmp[predLoc,"z"],nrow=10)
+  true_x=geometry_tmp[trueLoc,"x"]
+  true_z=geometry_tmp[trueLoc,"z"]
+  
+  
+  ave_x=diff(range(geometry_tmp$x))
+  ave_z=diff(range(geometry_tmp$z))
+  ave_dist=sqrt(ave_x^2+ave_z^2)
+  
+  weight=1/(1:nrow(predLoc))
+  weight=weight/sum(weight)
+  
+  dist_x=sweep(coordinate_x,2,true_x,"-")
+  dist_z=sweep(coordinate_z,2,true_z,"-")
+  
+  dist=sqrt(dist_x^2+dist_z^2)
+  
+  score=1-dist/ave_dist
+  score=colsums(sweep(score,1,weight,"*"))
+  
+  
+  
   # matchPos=sweep(predLoc,2,trueLoc,"==")
   # ind=which(matchPos,arr.ind = T)
   # sum(1/ind[,1])/length(trueLoc)

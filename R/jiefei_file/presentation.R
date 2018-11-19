@@ -4,7 +4,11 @@ result$model=gsub("_"," ",factor(paste(result$normalization,result$distance,sep=
 ggplot(result, aes(x=prediction_score, y=pattern_score_train,color=model)) + 
   geom_point()+guides(color=guide_legend(ncol=2))+labs(x="Prediction score", y="Pattern score")
 
+ggplot(result, aes(x=prediction_score, y=pattern_score_train)) + 
+  geom_point()+guides(color=guide_legend(ncol=2))+labs(x="Prediction score", y="Pattern score")
 
+result[which.max(result$pattern_score_train),]
+result[which.max(result$prediction_score),]
 
 model=as.character(unique(result$model))
 record=c()
@@ -22,3 +26,6 @@ for(i in 1:length(model)){
 }
 
 record
+
+
+result[which.max(result$pattern_score_train),]

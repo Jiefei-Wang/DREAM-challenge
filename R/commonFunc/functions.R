@@ -94,5 +94,15 @@ originalMethod<-function(mydata,simulation){
 # }
 
 
-
+nameConvert<-function(geneName,target){
+  if(target=="drop"){
+    geneName[geneName=="Blimp.1"]="Blimp-1"
+    geneName[geneName=="E.spl.m5.HLH"]="E(spl)m5-HLH"
+  }
+  if(target=="insitu"){
+    geneName[geneName=="Blimp-1"]="Blimp.1"
+    geneName[geneName=="E(spl)m5-HLH"]="E.spl.m5.HLH"
+  }
+  return(geneName)
+}
 

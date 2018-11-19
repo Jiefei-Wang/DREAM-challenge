@@ -13,7 +13,7 @@ computePattern_simple<-function(mydata,gene){
 
 computePattern_simple1<-function(mydata,gene){
   if(is.null(mydata$tmp_pattern)){
-    n=10
+    n=mydata$p_parm
     p=n/nrow(mydata$distance)
     tmp=mydata$distance
     #indice=apply(tmp,2,function(x,n){rank(x,ties.method="random")<=n},n=n)
@@ -27,10 +27,18 @@ computePattern_simple1<-function(mydata,gene){
   }
   geneExp=mydata$drop[gene,]
   pattern=sweep(mydata$tmp_pattern,2,geneExp,FUN = '*')
-  mydata$pattern=cbind(mydata$pattern,matrix(rowSums(pattern),ncol=1))
+  #geneExp2=geneExp
+  #geneExp2[geneExp2>0]=1
+  #pattern2=sweep(mydata$tmp_pattern,2,geneExp2,FUN = '*')
+  
+  
+  mydata$pattern=cbind(mydata[["pattern"]],matrix(rowSums(pattern),ncol=1))
   mydata
 }
+get_parm_simple1<-function(){
 
+  return(list(10))
+}
 
 
 computePattern_author<-function(mydata, gene) {
