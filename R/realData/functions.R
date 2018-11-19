@@ -1,6 +1,7 @@
 pickGene<-function(geneData,geneNum=NULL,ind=NULL){
   if(is.null(ind))
-    ind=sort(sample(1:84,geneNum))
+    ind=sample(1:84,geneNum)
+  ind=sort(ind)
   if(is.numeric(ind[1])){
     geneName=rownames(geneData$drop)[1:84]
     geneName=geneName[ind]

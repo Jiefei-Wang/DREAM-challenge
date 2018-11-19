@@ -14,9 +14,23 @@ source("R\\realData\\functions.R")
 
 load("R\\commonFunc\\authorBinaryData.RData")
 
+
+geneName=c("Ilp4","zen2","ImpE2","Proc","Poxm","betaTub56D","E(spl)m8-HLH","beta-Spec","CG8147","Chro","Pburs","l(1)sc","CG14427","Su(H)","Hr4","E(spl)mbeta-HLH","Egfr","danr","RluA-1","Taf1","par-1","neur","pnr","CrebB","srp","disco","hth","Thor","Mdr49","CG1136","pros","pdm2","E(spl)m5-HLH","PsGEF","shg","Doc2","Act5C","Traf4","Stat92E","slp1","numb","Ack-like","Ance","ImpL2","zfh1","CenG1A","Cyp310a1","caup","Chi","bowl","Antp","htl","slp2","rho","lack","velo","croc","NetA","salm","side","Btk29A","Mes2","abd-A","CtBP","Abd-B","RhoGEF2","exex","sala","mfas","Doc3","pan")
+geneName=nameConvert(geneName,target="drop")
+ind=which(geneName%in% colnames(geneData$insitu))
+ind=ind[1:20]
+
+
 geneData=simulation$simData
-ind=c(4,6,9,12,13,16,29,32,38,40,43,53,59,63,65,66,69,73,79,83)
-ind=c(2,3,6,7,8,11,12,13,14,15,17,18,22,24,25,26,32,33,34,37,38,42,43,46,50,52,54,58,59,60,63,64,66,67,68,69,70,76,79,81)
+ind=c(75,14,81,19,10,5,4,20,72,23,78,44,80,50,62,79,11,25,48,2)
+ind_1=c(57,54,73,78,20,72,24,4,81,41,23,62,80,44,11,50,25,79,2,48)
+ind_jiefei=c(4,6,9,12,13,16,29,32,38,40,43,53,59,63,65,66,69,73,79,83)
+ind=c(16,71,84,9,77,69,6,68,1,73,15,24,32,57,64,26,55,54,41,66,75,14,81,19,10,5,4,20,72,23,78,44,80,50,62,79,11,25,48,2)
+ind_1=c(64,69,16,26,1,68,55,77,9,6,75,10,84,14,53,32,66,5,19,71,57,54,73,78,20,72,24,4,81,41,23,62,80,44,11,50,25,79,2,48)
+ind_jiefei=c(4,6,7,12,13,15,17,18,22,24,26,30,31,32,33,34,36,37,38,40,41,42,43,45,52,55,58,59,60,61,62,63,64,65,66,67,68,69,72,81)
+ind=c(52,29,43,40,47,21,65,37,58,56,28,3,30,74,31,63,36,39,15,49,64,69,16,26,1,68,55,77,9,6,75,10,84,14,53,32,66,5,19,71,57,54,73,78,20,72,24,4,81,41,23,62,80,44,11,50,25,79,2,48)
+ind_jiefei=c(1,3,5,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,24,26,27,28,32,33,34,35,36,37,38,39,41,42,44,45,49,50,52,54,55,58,59,60,61,62,63,64,66,67,68,69,70,71,72,75,76,77,78,80,81,83)
+
 sim1=pickGene(geneData,ind=ind)
 
 colnames(sim1$insitu)
@@ -40,9 +54,15 @@ result[which.max(result$pattern_score_train),]
 dm=author_method(chanllege.data,sim1)
 author_method_score(dm,simulation$cell_loc)
 
+
+
+
+
+
+
+
+
 author_pattern=author_method_pattern(dm)
-
-
 
 
 mydata=modelList[[which.max(result$pattern_score_train)]]

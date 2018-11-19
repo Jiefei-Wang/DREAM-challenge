@@ -5,7 +5,7 @@ drop_data[drop_data>cutoff]=cutoff
 drop_data1=t(drop_data)
 
 
-geneNum=20
+geneNum=40
 ind=1:geneNum
 score_previous=0
 largest_score=0
@@ -13,7 +13,7 @@ record_score=c()
 record_ind=c()
 stopRule=0.001
 set.seed(1)
-for(i in 1:40){
+for(i in 1:100){
   res=foreach(i=1:(length(cl)*10),.combine = c,.packages = "DistMap")%dopar%{
     nchange=sample(1:10,1)
     index=ind
@@ -33,7 +33,7 @@ for(i in 1:40){
     score=mean(r2)
     list(list(score=score,index=index))
   }
-  
+  index_previous=ind
   score_previous=largest_score
   largest_score=0
   largest_ind=NULL
@@ -47,9 +47,14 @@ for(i in 1:40){
     record_ind=rbind(record_ind,tmp$index)
   }
   #ind=res[[largest_ind]]$index
+  if(score_previous<largest_score){
+    ind=res[[largest_ind]]$index
+  }else{
+    largest_score=score_previous
+  }
   message(largest_score)
-  maxInd=which.max(record_score)
-  ind=sort(record_ind[maxInd,])
+  #maxInd=which.max(record_score)
+  #ind=sort(record_ind[maxInd,])
 }
 plot(record_score)
 maxInd=which.max(record_score)
