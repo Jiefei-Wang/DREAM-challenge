@@ -234,7 +234,7 @@ normalize_dropClusterOnly_parm<-function(mydata){
 }
 
 get_parm_dropClusterOnly_parm<-function(){
-  seq(0.1, 0.9, 0.05)
+  seq(0.05, 0.95, 0.01)
 }
 
 normalize_dropClusterOnly_wholeMatrix_parm<-function(mydata){

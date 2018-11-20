@@ -58,7 +58,7 @@ computeDist_mcc1 <-function(mydata){
 computeDist_Weighted_mcc <-function(mydata){
   all_drop=t(mydata$N_drop[1:84,])
   dropName=rownames(mydata$drop)[1:84]
-  driverNum=ncol(mydata$insitu)
+  driverNum=mydata$refNum
   
   drop_cor=abs(cor(all_drop))
   
@@ -83,3 +83,43 @@ computeDist_Weighted_mcc <-function(mydata){
   return (mydata)
 }
 
+computeDist_Weighted_mcc_projection <-function(mydata){
+  all_drop=t(mydata$N_drop[1:84,])
+  dropName=rownames(mydata$drop)[1:84]
+  driverNum=mydata$refNum
+  
+  drop_ref=all_drop[,1:driverNum]
+  drop_nonref=all_drop[,(driverNum+1):84]
+  
+  drop_norm=sqrt(colsums(all_drop*all_drop))
+  drop_norm_ref=drop_norm[1:driverNum]
+  drop_norm_nonref=drop_norm[(driverNum+1):84]
+  
+  drop_ref=sweep(drop_ref,2,drop_norm_ref,"/")
+  drop_nonref=sweep(drop_nonref,2,drop_norm_nonref,"/")
+  
+  weight=c()
+  for(i in 1:ncol(drop_ref)){
+    score=colsums(sweep(drop_nonref,1,drop_ref[,i],"*"))
+    weight[i]=sum(abs(score))
+  }
+  
+  weight=weight/sum(weight)
+  
+  drop=mydata$N_drop[1:driverNum,]
+  #special treatment of 0 variance cells
+  drop_var=apply(drop,2,var)
+  ind=which(drop_var==0)
+  for(i in ind){
+    drop[sample(1:driverNum,2),i]=c(0,1)
+  }
+  
+  insitu=t(mydata$N_insitu)
+  mcc = matrix(nrow = nrow(mydata$insitu),ncol = ncol(drop))
+  for(i in 1:nrow(mydata$insitu)){
+    mcc[i,] <- weighted_cor(insitu[,i],drop,weight)
+  }
+  
+  mydata$distance=1-mcc
+  return (mydata)
+}

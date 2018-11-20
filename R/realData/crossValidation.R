@@ -30,7 +30,7 @@ computePerformance_crossValidation<-function(modelList,geneData,cell_loc){
         geneData1$drop=rbind(drop_ref[-gene_valid_id,],drop_ref[gene_valid_id,,drop=F],drop_nonref)
         curModel=normalize(curModel,geneData1)
         curModel=compute_dist(curModel)
-        curModel=predict_pattern(curModel,patternInd=1,gene.end=curModel$refNum,gene.start = curModel$refNum)
+        curModel=predict_pattern(curModel,patternInd=1,gene.end=refNum,gene.start = refNum)
         score[gene_valid_id]=patternScore_SS(curModel$pattern,insitu[,gene_valid_id,drop=F],1,1)
         message(gene_valid_id)
       }

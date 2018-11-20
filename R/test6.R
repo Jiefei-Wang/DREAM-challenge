@@ -43,7 +43,7 @@ getPatternFuncs()
 
 modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("Weighted_mcc","mcc1"),pattern=c("simple1"))
 
-modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("mcc1"),pattern=c("author_mcc"))
+modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("mcc1"),pattern=c("simple1"))
 
 
 
@@ -54,9 +54,29 @@ toc()
 result[which.max(result$pattern_score_train),]
 result[which.max(result$prediction_score),]
 
+result[which.max(result$pattern_score_train[result$pattern=="simple1(10)"]),]
+result[which.max(result$pattern_score_train[result$pattern=="author_mcc(0.6)"]),]
 
-#result=computePerformance_crossValidation(modelList,sim1,simulation$cell_loc)
-#plot(result$prediction,result$pattern)
+result[result$pattern=="simple1(10)",]
+result[result$pattern=="author_mcc(0.6)",]
+
+
+result1=computePerformance_crossValidation(modelList,sim1,simulation$cell_loc)
+plot(result1$prediction,result1$pattern)
+which.max(result1$pattern)
+
+
+drop=t(geneData$drop[1:84,])
+quantileList=seq(0.1,0.5,0.01)
+var_record=c()
+for(i in 1:length(quantileList)){
+  drop_tmp=apply(drop,2,function(x,q){x>quantile(x[x!=0],q)},q=quantileList[i])
+  drop_var=diag(var(drop_tmp,drop_tmp))
+  var_record=c(var_record,median(drop_var))
+}
+which.max(var_record)
+quantileList[which.max(var_record)]
+plot(var_record)
 
 
 dm=author_method(chanllege.data,geneData)
@@ -73,14 +93,43 @@ mydata=modelList[[which.max(result$pattern_score_train)]]
 mymodel=normalize(mydata,sim1)
 mymodel=compute_dist(mymodel)
 mymodel=pred_loc(mymodel)
-mymodel=predict_pattern(mymodel,patternInd=1,20)
+mymodel=predict_pattern(mymodel,patternInd=1,84)
 
-patternScore_SS(mymodel$pattern,mymodel$insitu,1,20)
+
+
+index=sort(ind)
+
+mymodel$insitu=cbind(geneData$insitu[,index],geneData$insitu[,-index])
+score=patternScore_SS(mymodel$pattern,mymodel$insitu,1,84)
+plot(score)
+mean(score[21:84])
+
+
+mydata=modelList[[which.max(result$prediction_score)]]
+mymodel=normalize(mydata,sim1)
+mymodel=compute_dist(mymodel)
+mymodel=pred_loc(mymodel)
+mymodel=predict_pattern(mymodel,patternInd=1,84)
+
+
+
+index=sort(ind)
+
+mymodel$insitu=cbind(geneData$insitu[,index],geneData$insitu[,-index])
+score=patternScore_SS(mymodel$pattern,mymodel$insitu,1,84)
+mean(score[21:84])
+
+
+
+
+
+
+
 
 geneNameList=rownames(mymodel$drop)[1:84]
 
 
-gene=3
+gene=8
 geneName=geneNameList[gene]
 par(mfrow=c(2,2))
 intensityPlot3(geneData$insitu[,geneName],geometry,title="true pattern")
