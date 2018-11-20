@@ -2,7 +2,7 @@ library(doParallel)
 for(pkg in clusterPkg)
   library(pkg,character.only=T)
 clusterExport(cl,"geometry")
-
+clusterExport(cl,"weighted_cor")
 
 #========================Read functions into a namespace=======================
 for(env in search()){
@@ -152,12 +152,12 @@ predLocation<-function(mydata){
   return(mydata)
 }
 
-predict_pattern<-function(mydata,patternInd,gene.end=mydata$geneNum){
+predict_pattern<-function(mydata,patternInd,gene.end=mydata$geneNum,gene.start=1){
   patternFuncList=mydata$compute_pattern
   parmList=mydata$p_parm
   mydata$compute_pattern=patternFuncList[[patternInd]]
   mydata$p_parm=parmList[[patternInd]]
-  for(i in 1:gene.end){
+  for(i in gene.start:gene.end){
     mydata=mydata$compute_pattern(mydata,i)
   }
   mydata$patternModel=paste0(mydata$funcName[3+patternInd-1],"(",mydata$p_parm,")")

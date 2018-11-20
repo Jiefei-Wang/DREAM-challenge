@@ -75,3 +75,5 @@ findgeneInd<-function(geneName,geneList){
   }
   (1:length(geneList))[geneList%in% geneName]
 }
+
+

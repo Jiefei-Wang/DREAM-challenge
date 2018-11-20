@@ -41,6 +41,7 @@ get_parm_simple1<-function(){
 }
 
 
+
 computePattern_author<-function(mydata, gene) {
   threshold=mydata$p_parm
   gene.expr <- mydata$drop[gene,]
@@ -61,6 +62,34 @@ computePattern_author<-function(mydata, gene) {
 }
 
 get_parm_author<-function(){
+  n=10
+  #return(as.list(seq(1,n-1)/n))
+  return(list(0.6))
+}
+
+computePattern_author_mcc<-function(mydata, gene) {
+  if(is.null(mydata$tmp_pattern)){
+  similarity=t(1-mydata$distance)
+  similarity[similarity<0]=0
+  mydata$tmp_pattern=similarity
+  }
+  threshold=mydata$p_parm
+  gene.expr <- mydata$drop[gene,]
+  b1 <- sweep(mydata$tmp_pattern, 1, gene.expr, '*')
+  ind=(gene.expr > 0)
+  b2=b1
+  b2[ind,]=mydata$tmp_pattern[ind,]
+  #gene.expr=gene.expr[gene.expr > 0] <- 1
+  #b2 <- sweep(similarity, 1, gene.expr, '*')
+  q <- colsums(b1)/colsums(b2)
+  q[is.na(q)] <- 0
+  q <- q/(1+q)
+  q[q < quantile(q, threshold)] <- 0
+  mydata$pattern=cbind(mydata$pattern,matrix(q,ncol=1))
+  mydata
+}
+
+get_parm_author_mcc<-function(){
   n=10
   #return(as.list(seq(1,n-1)/n))
   return(list(0.6))

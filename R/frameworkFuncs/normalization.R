@@ -216,7 +216,7 @@ get_parm_autoCluster_quantile<-function(){
 
 normalize_dropClusterOnly_parm<-function(mydata){
   parm=mydata$N_parm
-  N_driver=ncol(mydata$insitu)
+  N_driver=84
   mydata$N_insitu=mydata$insitu
   tmp=mydata$drop[1:N_driver,]
   
@@ -234,7 +234,7 @@ normalize_dropClusterOnly_parm<-function(mydata){
 }
 
 get_parm_dropClusterOnly_parm<-function(){
-  seq(0.1, 0.4, 0.01)
+  seq(0.1, 0.9, 0.05)
 }
 
 normalize_dropClusterOnly_wholeMatrix_parm<-function(mydata){

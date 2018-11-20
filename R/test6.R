@@ -2,9 +2,10 @@ library(doParallel)
 library(ggplot2) 
 library(tictoc)
 library(psych)
+library(wCorr)
 #Set the number of the clusters and the packages that will be export to the clusters.
 clusterNum=detectCores()-1
-clusterPkg=c("np","rpgm","Rfast","edgeR")
+clusterPkg=c("np","rpgm","Rfast","edgeR","wCorr")
 source("R\\commonFunc\\createCluster.R")
 source("R\\commonFunc\\readData.R")
 source("R\\commonFunc\\functions.R")
@@ -40,8 +41,9 @@ getNormFuncs()
 getDistFuncs()
 getPatternFuncs()
 
-modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("mcc"),pattern=c("simple1"))
+modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("Weighted_mcc","mcc1"),pattern=c("simple1"))
 
+modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("mcc1"),pattern=c("author_mcc"))
 
 
 
@@ -50,34 +52,66 @@ tic()
 result=computePerformance_real(modelList,sim1,simulation$cell_loc,parallel=T)
 toc()
 result[which.max(result$pattern_score_train),]
+result[which.max(result$prediction_score),]
+
+
+#result=computePerformance_crossValidation(modelList,sim1,simulation$cell_loc)
+#plot(result$prediction,result$pattern)
+
+
+dm=author_method(chanllege.data,geneData)
 
 dm=author_method(chanllege.data,sim1)
 author_method_score(dm,simulation$cell_loc)
 
-
-
-
-
-
-
-
-
 author_pattern=author_method_pattern(dm)
 
 
+
+
 mydata=modelList[[which.max(result$pattern_score_train)]]
-mymodel=normalize(mydata,geneData)
+mymodel=normalize(mydata,sim1)
 mymodel=compute_dist(mymodel)
 mymodel=pred_loc(mymodel)
-mymodel$p_parm[[1]]=50
-mymodel$tmp_pattern=NULL
-mymodel=predict_pattern(mymodel,patternInd=1,84)
+mymodel=predict_pattern(mymodel,patternInd=1,20)
 
-gene=2
+patternScore_SS(mymodel$pattern,mymodel$insitu,1,20)
 
-intensityPlot3(geneData$insitu[,gene],geometry,title="true pattern")
+geneNameList=rownames(mymodel$drop)[1:84]
+
+
+gene=3
+geneName=geneNameList[gene]
+par(mfrow=c(2,2))
+intensityPlot3(geneData$insitu[,geneName],geometry,title="true pattern")
+intensityPlot3(mymodel$pattern[,gene],geometry,title="predicted pattern")
+intensityPlot3(author_pattern[,gene]>quantile(author_pattern[,gene],1-mean(geneData$insitu[,geneName])),geometry,title="predicted pattern")
+intensityPlot3(mymodel$pattern[,gene]>quantile(mymodel$pattern[,gene],1-mean(geneData$insitu[,geneName])),geometry,title="quantile")
+#intensityPlot3(mymodel1$pattern[,gene],geometry,title="predicted pattern")
+par(mfrow=c(1,1))
+
+
+
+mydata1=modelList[[which.max(result$prediction_score)]]
+mymodel1=predict_all(mydata,sim1,pattern = F)
+mymodel1=predict_pattern(mymodel1,patternInd=1,20)
+
+
+
+par(mfrow=c(2,2))
+intensityPlot3(geneData$insitu[,geneName],geometry,title="true pattern")
 intensityPlot3(mymodel$pattern[,gene],geometry,title="predicted pattern")
 intensityPlot3(author_pattern[,gene],geometry,title="predicted pattern")
+par(mfrow=c(1,1))
+
+
+
+
+
+
+
+
+
 
 
 cell=317

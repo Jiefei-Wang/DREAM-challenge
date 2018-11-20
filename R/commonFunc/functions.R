@@ -106,3 +106,13 @@ nameConvert<-function(geneName,target){
   return(geneName)
 }
 
+weighted_cor<-function(x,y,w){
+  x_m=sum(w*x)/sum(w)
+  y_m=colsums(sweep(y,1,w,"*"))/sum(w)
+  x_tmp=x-x_m
+  y_tmp=sweep(y,2,y_m,"-")
+  num=colsums(sweep(y_tmp,1,w*x_tmp,"*"))
+  den=sqrt(sum(w*x_tmp^2)*colsums(sweep(y_tmp^2,1,w,"*")))
+  num/den
+}
+

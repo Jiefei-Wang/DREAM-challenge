@@ -11,14 +11,15 @@ computePerformance_real<-function(modelList,geneData,cell_loc,parallel){
     performance=foreach(i=1:length(modelList),.combine= rbind,.multicombine=TRUE,.inorder=FALSE,.export=export,.packages=clusterPkg)%dopar%{
       curModel=modelList[[i]]
       curModel=predict_all(curModel,geneData,pattern=F)
-      res=c()
+      performance=c()
       patternFuncList=curModel$compute_pattern
       for(j in 1:length(patternFuncList)){
-        curModel$tmp_pattern=NULL
-        curModel=predict_pattern(curModel,patternInd=j,curModel$refNum)
-        res=rbind(res,getSummaryScore_real(curModel,cell_loc))
+        tmpModel=curModel
+        tmpModel=predict_pattern(tmpModel,patternInd=j,tmpModel$refNum)
+        tmpModel$p_parm=tmpModel$p_parm[[j]]
+        performance=rbind(performance,getSummaryScore_real(tmpModel,cell_loc))
       }
-      res
+      performance
     }
   }else{
     for(i in 1:length(modelList)){
@@ -27,9 +28,10 @@ computePerformance_real<-function(modelList,geneData,cell_loc,parallel){
       patternFuncList=curModel$compute_pattern
       
       for(j in 1:length(patternFuncList)){
-        curModel$tmp_pattern=NULL
-        curModel=predict_pattern(curModel,patternInd=j,curModel$refNum)
-        performance=rbind(performance,getSummaryScore_real(curModel,cell_loc))
+        tmpModel=curModel
+        tmpModel=predict_pattern(tmpModel,patternInd=j,tmpModel$refNum)
+        tmpModel$p_parm=tmpModel$p_parm[[j]]
+        performance=rbind(performance,getSummaryScore_real(tmpModel,cell_loc))
       }
     }
   }
@@ -67,10 +69,10 @@ getSummaryScore_real<-function(mydata,cell_loc){
 
 
 
-#predPattern=pattern_author_res
-#truePattern=chanllege.data$insitu.raw
-#gene_start=1
-#gene_end=84
+#predPattern=mymodel$pattern
+#truePattern=mymodel$insitu
+#gene_start=2
+#gene_end=2
 
 patternScore_SS<-function(predPattern,truePattern,gene_start,gene_end){
   turning=0.01

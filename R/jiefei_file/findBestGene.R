@@ -5,7 +5,7 @@ drop_data[drop_data>cutoff]=cutoff
 drop_data1=t(drop_data)
 
 
-geneNum=40
+geneNum=20
 ind=1:geneNum
 score_previous=0
 largest_score=0
@@ -14,8 +14,8 @@ record_ind=c()
 stopRule=0.001
 set.seed(1)
 for(i in 1:100){
-  res=foreach(i=1:(length(cl)*10),.combine = c,.packages = "DistMap")%dopar%{
-    nchange=sample(1:10,1)
+  res=foreach(i=1:(length(cl)*5),.combine = c,.packages = "DistMap")%dopar%{
+    nchange=sample(1:min(10,length(ind)),1)
     index=ind
     candidate=1:84
     candidate=candidate[-index]
@@ -52,7 +52,7 @@ for(i in 1:100){
   }else{
     largest_score=score_previous
   }
-  message(largest_score)
+  message(i,":",largest_score)
   #maxInd=which.max(record_score)
   #ind=sort(record_ind[maxInd,])
 }
