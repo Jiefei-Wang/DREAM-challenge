@@ -1,7 +1,7 @@
 buildModel<-function(){
   myModel=list()
   myModel$normalize=normalize_dropClusterOnly_parm
-  myModel$computeDist=computeDist_Weighted_mcc_projection
+  myModel$computeDist=computeDist_Weighted_mcc
   myModel$compute_pattern=computePattern_author
   
   N_parm=get_parm_dropClusterOnly_parm()
@@ -42,27 +42,14 @@ get_parm_dropClusterOnly_parm<-function(){
 }
 
 
-computeDist_Weighted_mcc_projection <-function(mydata){
+computeDist_Weighted_mcc <-function(mydata){
   all_drop=t(mydata$N_drop[1:84,])
   dropName=rownames(mydata$drop)[1:84]
   driverNum=mydata$refNum
   
-  drop_ref=all_drop[,1:driverNum]
-  drop_nonref=all_drop[,(driverNum+1):84]
+  drop_cor=abs(cor(all_drop))
   
-  drop_norm=sqrt(colsums(all_drop*all_drop))
-  drop_norm_ref=drop_norm[1:driverNum]
-  drop_norm_nonref=drop_norm[(driverNum+1):84]
-  
-  drop_ref=sweep(drop_ref,2,drop_norm_ref,"/")
-  drop_nonref=sweep(drop_nonref,2,drop_norm_nonref,"/")
-  
-  weight=c()
-  for(i in 1:ncol(drop_ref)){
-    score=colsums(sweep(drop_nonref,1,drop_ref[,i],"*"))
-    weight[i]=sum(abs(score))
-  }
-  
+  weight=colsums(drop_cor[(driverNum+1):84,1:driverNum])+1
   weight=weight/sum(weight)
   
   drop=mydata$N_drop[1:driverNum,]
@@ -79,15 +66,15 @@ computeDist_Weighted_mcc_projection <-function(mydata){
     mcc[i,] <- weighted_cor(insitu[,i],drop,weight)
   }
   
-  mydata$distance=1-mcc
+  mydata$distance=mcc
   return (mydata)
 }
+
 
 computePattern_author<-function(mydata, gene) {
   threshold=mydata$p_parm
   gene.expr <- mydata$drop[gene,]
-  m=max(mydata$distance)
-  similarity=t(m-mydata$distance)
+  similarity=t(mydata$distance)
   b1 <- sweep(similarity, 1, gene.expr, '*')
   ind=(gene.expr > 0)
   b2=b1
