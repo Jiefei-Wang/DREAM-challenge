@@ -2,11 +2,10 @@ library(doParallel)
 library(ggplot2) 
 library(tictoc)
 library(psych)
-library(wCorr)
 library(caret)
 #Set the number of the clusters and the packages that will be export to the clusters.
 clusterNum=detectCores()-1
-clusterPkg=c("np","rpgm","Rfast","edgeR","wCorr","caret")
+clusterPkg=c("np","rpgm","Rfast","edgeR","caret")
 source("R\\commonFunc\\createCluster.R")
 source("R\\commonFunc\\readData.R")
 source("R\\commonFunc\\functions.R")

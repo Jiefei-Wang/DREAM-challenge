@@ -30,7 +30,7 @@ sim1=pickGene(geneData,ind=ind)
 
 modelList=buildModel()
 
-result1=CV(modelList,sim1,foldNum=2)
+result1=CV(modelList,sim1,foldNum=10)
 
 mydata=modelList[[which.max(result1)]]
 mymodel=normalize(mydata,sim1)
@@ -38,5 +38,11 @@ mymodel=compute_dist(mymodel)
 mymodel=pred_loc(mymodel)
 
 computePerformance_real(list(modelList[[which.max(result1$pattern)]]),sim1,simulation$cell_loc,parallel=T)
+
+
+
+
+
+
 
 
