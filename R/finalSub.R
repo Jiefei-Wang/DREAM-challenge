@@ -5,12 +5,18 @@ library(caret)
 clusterNum=detectCores()-1
 clusterPkg=c("Rfast","edgeR","caret")
 source("R\\commonFunc\\createCluster.R")
-source("R\\commonFunc\\readData.R")
-source("R\\commonFunc\\functions.R")
-source("R\\frameworkFuncs\\framework.R")
-source("R\\realData\\scoring_real.R")
-source("R\\realData\\functions.R")
-source("R\\realData\\crossValidation.R")
+
+for(pkg in clusterPkg)
+  library(pkg,character.only=T)
+clusterExport(cl,"geometry")
+clusterExport(cl,"weighted_cor")
+
+
+source("R\\submission1\\crossValidation.R")
+source("R\\submission1\\framework.R")
+source("R\\submission1\\lossFunc.R")
+source("R\\submission1\\modelFuncs.R")
+source("R\\submission1\\tools.R")
 
 load("R\\commonFunc\\authorBinaryData.RData")
 
@@ -27,7 +33,6 @@ sim1=pickGene(geneData,ind=ind)
 modelList=buildModel()
 
 result1=CV(modelList,sim1,foldNum=10)
-result2=computePerformance_crossValidation(modelList,sim1,simulation$cell_loc,foldNum=10)
 
 mydata=modelList[[which.max(result1)]]
 mymodel=normalize(mydata,sim1)
