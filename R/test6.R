@@ -1,11 +1,9 @@
 library(doParallel)
-library(ggplot2) 
 library(tictoc)
-library(psych)
 library(caret)
 #Set the number of the clusters and the packages that will be export to the clusters.
 clusterNum=detectCores()-1
-clusterPkg=c("np","rpgm","Rfast","edgeR","caret")
+clusterPkg=c("np","rpgm","Rfast","caret")
 source("R\\commonFunc\\createCluster.R")
 source("R\\commonFunc\\readData.R")
 source("R\\commonFunc\\functions.R")
@@ -66,7 +64,6 @@ result1=computePerformance_crossValidation(modelList,sim1,simulation$cell_loc,fo
 plot(result1$prediction,result1$pattern)
 which.max(result1$pattern)
 modelList[[which.max(result1$pattern)]]$N_parm
-
 
 
 drop=t(geneData$drop[1:84,])
