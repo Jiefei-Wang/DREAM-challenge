@@ -3,15 +3,17 @@ library(ggplot2)
 library(tictoc)
 library(psych)
 library(wCorr)
+library(caret)
 #Set the number of the clusters and the packages that will be export to the clusters.
 clusterNum=detectCores()-1
-clusterPkg=c("np","rpgm","Rfast","edgeR","wCorr")
+clusterPkg=c("np","rpgm","Rfast","edgeR","wCorr","caret")
 source("R\\commonFunc\\createCluster.R")
 source("R\\commonFunc\\readData.R")
 source("R\\commonFunc\\functions.R")
 source("R\\frameworkFuncs\\framework.R")
 source("R\\realData\\scoring_real.R")
 source("R\\realData\\functions.R")
+source("R\\realData\\crossValidation.R")
 
 load("R\\commonFunc\\authorBinaryData.RData")
 
@@ -43,7 +45,7 @@ getPatternFuncs()
 
 modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("Weighted_mcc","mcc1"),pattern=c("simple1"))
 
-modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("mcc1"),pattern=c("simple1"))
+modelList=attachFunc_list(normalization=c("dropClusterOnly_parm"),distance=c("Weighted_mcc"),pattern=c("author"))
 
 
 
@@ -61,9 +63,11 @@ result[result$pattern=="simple1(10)",]
 result[result$pattern=="author_mcc(0.6)",]
 
 
-result1=computePerformance_crossValidation(modelList,sim1,simulation$cell_loc)
+result1=computePerformance_crossValidation(modelList,sim1,simulation$cell_loc,foldNum=10)
 plot(result1$prediction,result1$pattern)
 which.max(result1$pattern)
+modelList[[which.max(result1$pattern)]]$N_parm
+
 
 
 drop=t(geneData$drop[1:84,])

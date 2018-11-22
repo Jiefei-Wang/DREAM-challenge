@@ -1,4 +1,6 @@
-computePerformance_crossValidation<-function(modelList,geneData,cell_loc){
+
+
+computePerformance_crossValidation<-function(modelList,geneData,cell_loc,foldNum){
   performance=c()
     #Add the global function into export list
     g=ls(globalenv())
@@ -21,18 +23,21 @@ computePerformance_crossValidation<-function(modelList,geneData,cell_loc){
       curModel=predict_all(curModel,geneData,pattern=F)
       pred_score=predictionScore(curModel$loc,cell_loc)
       pred_score=mean(pred_score)
+      set.seed(1)
+      flds <- createFolds(1:refNum, k = foldNum, list = TRUE, returnTrain = FALSE)
       
       score=c()
-      for(gene_valid_id in 1:geneData$refNum){
+      for(k in 1:foldNum){
+        index=flds[[k]]
         curModel=modelList[[i]]
-        geneData1$refNum=refNum-1
-        geneData1$insitu=insitu[,-gene_valid_id]
-        geneData1$drop=rbind(drop_ref[-gene_valid_id,],drop_ref[gene_valid_id,,drop=F],drop_nonref)
+        geneData1$refNum=refNum-length(index)
+        geneData1$insitu=insitu[,-index]
+        geneData1$drop=rbind(drop_ref[-index,],drop_ref[index,,drop=F],drop_nonref)
         curModel=normalize(curModel,geneData1)
         curModel=compute_dist(curModel)
-        curModel=predict_pattern(curModel,patternInd=1,gene.end=refNum,gene.start = refNum)
-        score[gene_valid_id]=patternScore_SS(curModel$pattern,insitu[,gene_valid_id,drop=F],1,1)
-        message(gene_valid_id)
+        curModel=predict_pattern(curModel,patternInd=1,gene.end=refNum,gene.start = refNum-length(index)+1)
+        score=c(score,patternScore_SS(curModel$pattern,insitu[,index,drop=F],length(index),1))
+        message(k)
       }
       score=mean(score)
       

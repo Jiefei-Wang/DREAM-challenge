@@ -3,7 +3,6 @@ for(pkg in clusterPkg)
   library(pkg,character.only=T)
 clusterExport(cl,"geometry")
 clusterExport(cl,"weighted_cor")
-
 #========================Read functions into a namespace=======================
 for(env in search()){
   if(env=="Normalization") detach(env,character.only=T)
