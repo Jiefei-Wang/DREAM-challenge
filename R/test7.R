@@ -28,8 +28,9 @@ predictionScore<-function(predLoc,trueLoc){
   score=colsums(sweep(score,1,weight,"*"))
 }
 
+load("R\\commonFunc\\GeneData.RData")
 load("R\\commonFunc\\authorBinaryData.RData")
 
-
-pred_score=predictionScore(mymodel$loc,geneData$cell_loc)
-geneData
+geometry=chanllege.data$geometry
+pred_score=predictionScore(mymodel$loc,simulation$cell_loc)
+mean(pred_score)

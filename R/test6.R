@@ -89,7 +89,7 @@ author_pattern=author_method_pattern(dm)
 
 
 
-mydata=modelList[[which.max(result$pattern_score_train)]]
+mydata=modelList[[23]]
 mymodel=normalize(mydata,sim1)
 mymodel=compute_dist(mymodel)
 mymodel=pred_loc(mymodel)

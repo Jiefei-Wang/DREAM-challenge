@@ -6,14 +6,11 @@ normalize<-function(model,geneData){
 compute_dist<-function(mydata){
   mydata$computeDist(mydata)
 }
-pred_loc<-function(mydata){
-  mydata$pred_loc(mydata)
-}
 
-predLocation<-function(mydata){
+pred_loc<-function(mydata){
   predict_num=10
   #Compute the rank
-  rank_distance=apply(mydata$distance,2,rank,ties.method="random")
+  rank_distance=apply(-mydata$distance,2,rank,ties.method="random")
   ind=which(rank_distance<=predict_num,arr.ind=T)
   sort_order=apply(matrix(rank_distance[ind],nrow=predict_num),2,order)
   loc=matrix(ind[,1],nrow=predict_num)
