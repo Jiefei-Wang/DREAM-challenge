@@ -74,7 +74,7 @@ computeDist_Weighted_mcc <-function(mydata){
 computePattern_author<-function(mydata, gene) {
   threshold=mydata$p_parm
   gene.expr <- mydata$drop[gene,]
-  similarity=t(mydata$distance)
+  similarity=mcc-min(mcc)
   b1 <- sweep(similarity, 1, gene.expr, '*')
   ind=(gene.expr > 0)
   b2=b1
