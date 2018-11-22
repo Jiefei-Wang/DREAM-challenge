@@ -3,22 +3,20 @@ library(tictoc)
 library(caret)
 #Set the number of the clusters and the packages that will be export to the clusters.
 clusterNum=detectCores()-1
-clusterPkg=c("Rfast","edgeR","caret")
+clusterPkg=c("Rfast","caret")
 source("R\\commonFunc\\createCluster.R")
-
-for(pkg in clusterPkg)
-  library(pkg,character.only=T)
-clusterExport(cl,"geometry")
-clusterExport(cl,"weighted_cor")
-
-
 source("R\\submission1\\crossValidation.R")
 source("R\\submission1\\framework.R")
 source("R\\submission1\\lossFunc.R")
 source("R\\submission1\\modelFuncs.R")
 source("R\\submission1\\tools.R")
-
 load("R\\commonFunc\\authorBinaryData.RData")
+
+for(pkg in clusterPkg)
+  library(pkg,character.only=T)
+clusterExport(cl,"weighted_cor")
+
+
 
 
 
@@ -32,7 +30,7 @@ sim1=pickGene(geneData,ind=ind)
 
 modelList=buildModel()
 
-result1=CV(modelList,sim1,foldNum=10)
+result1=CV(modelList,sim1,foldNum=2)
 
 mydata=modelList[[which.max(result1)]]
 mymodel=normalize(mydata,sim1)
